@@ -216,9 +216,6 @@ module.exports = {
         // Run every 2 hours at minute 0
         cron.schedule('0 */2 * * *', () => pullJobsFromTelegram());
         console.log('⏰ Telegram Puller Cron Job Initialized (Runs every 2 hours).');
-        
-        // Also run once on startup (after 5 seconds delay to let DB connect)
-        setTimeout(() => pullJobsFromTelegram(), 5000);
     },
     // Expose for manual triggering
     triggerManualPull: pullJobsFromTelegram
