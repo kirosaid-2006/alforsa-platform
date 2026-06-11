@@ -21,6 +21,7 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
 // Middlewares
+app.set('trust proxy', 1); // Trust the Render reverse proxy for secure cookies
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
