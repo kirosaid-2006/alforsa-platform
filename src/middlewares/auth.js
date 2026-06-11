@@ -30,7 +30,7 @@ exports.attachUser = async (req, res, next) => {
                             required: false
                         }],
                         // Count only if there is no outcome record
-                        having: sequelize.literal('`EmploymentOutcome`.`id` IS NULL')
+                        having: sequelize.literal('"EmploymentOutcome"."id" IS NULL')
                     });
                     
                     res.locals.pendingSurveys = pendingSurveysCount;
