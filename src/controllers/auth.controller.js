@@ -120,7 +120,16 @@ exports.showLogin = (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { login_identifier, password } = req.body;
+        let { login_identifier, password } = req.body;
+
+        // Convert Arabic numerals to English numerals
+        const toEnglishNumbers = (str) => {
+            if (!str) return str;
+            const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return str.replace(/[٠-٩]/g, w => arabicNumbers.indexOf(w));
+        };
+        
+        login_identifier = toEnglishNumbers(login_identifier);
 
         const user = await User.findOne({
             where: {
@@ -150,21 +159,25 @@ exports.login = async (req, res) => {
             role: user.Role.name
         };
 
-        req.flash('success', `مرحباً بك مجدداً، ${user.full_name.split(' ')[0]}`);
+        req.flash('success', `مرحباً بك مجدداً ${user.full_name.split(' ')[0]}`);
         
-        // Redirect based on role or to saved redirect
-        const redirectUrl = req.query.redirect;
-        if (redirectUrl) {
-            return res.redirect(redirectUrl);
-        }
+        req.session.save((err) => {
+            if (err) console.error('Session save error:', err);
+            
+            // Redirect based on role or to saved redirect
+            const redirectUrl = req.query.redirect;
+            if (redirectUrl) {
+                return res.redirect(redirectUrl);
+            }
 
-        if (user.Role.name === 'admin' || user.Role.name === 'super_admin') {
-            res.redirect('/admin');
-        } else if (user.Role.name === 'employer') {
-            res.redirect('/employer');
-        } else {
-            res.redirect('/user/dashboard');
-        }
+            if (user.Role.name === 'admin' || user.Role.name === 'super_admin') {
+                res.redirect('/admin');
+            } else if (user.Role.name === 'employer') {
+                res.redirect('/employer');
+            } else {
+                res.redirect('/user/dashboard');
+            }
+        });
 
     } catch (error) {
         console.error('Login Error:', error);
