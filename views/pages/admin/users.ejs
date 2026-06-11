@@ -1,0 +1,107 @@
+<!-- Admin Navbar -->
+<%- include('../../partials/admin-sidebar', { path: '/admin/users' }) %>
+
+<!-- Main Content -->
+<div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="margin: 0;">إدارة المستخدمين 👥</h2>
+        </div>
+
+        <!-- Filters -->
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+            <form action="/admin/users" method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">بحث (الاسم، الهاتف، الرقم القومي)</label>
+                    <input type="text" name="search" class="form-control" value="<%= locals.query?.search || '' %>" placeholder="بحث...">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">المؤهل الدراسي</label>
+                    <select name="qual" class="form-control">
+                        <option value="">الكل</option>
+                        <option value="none" <%= locals.query?.qual === 'none' ? 'selected' : '' %>>بدون مؤهل</option>
+                        <option value="diploma" <%= locals.query?.qual === 'diploma' ? 'selected' : '' %>>دبلوم</option>
+                        <option value="institute" <%= locals.query?.qual === 'institute' ? 'selected' : '' %>>معهد</option>
+                        <option value="bachelors" <%= locals.query?.qual === 'bachelors' ? 'selected' : '' %>>بكالوريوس/ليسانس</option>
+                        <option value="masters" <%= locals.query?.qual === 'masters' ? 'selected' : '' %>>ماجستير</option>
+                        <option value="phd" <%= locals.query?.qual === 'phd' ? 'selected' : '' %>>دكتوراه</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">اسم الكلية / المعهد</label>
+                    <select name="college" class="form-control">
+                        <option value="">الكل</option>
+                        <% if (locals.collegeList && collegeList.length > 0) { %>
+                            <% collegeList.forEach(c => { %>
+                                <option value="<%= c %>" <%= locals.query?.college === c ? 'selected' : '' %>><%= c %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">تصفية النتائج 🔍</button>
+                    <a href="/admin/users" class="btn btn-outline" style="padding: 0.8rem;">إلغاء</a>
+                </div>
+            </form>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);">
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; text-align: right; border-collapse: collapse; min-width: 800px;">
+                    <thead>
+                        <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border);">
+                            <th style="padding: 1rem 1.5rem;">الاسم</th>
+                            <th style="padding: 1rem 1.5rem;">رقم الهاتف</th>
+                            <th style="padding: 1rem 1.5rem;">الدور (Role)</th>
+                            <th style="padding: 1rem 1.5rem;">تاريخ التسجيل</th>
+                            <th style="padding: 1rem 1.5rem;">الحالة</th>
+                            <th style="padding: 1rem 1.5rem; text-align: center;">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (locals.users && users.length > 0) { %>
+                            <% users.forEach(u => { %>
+                                <tr style="border-bottom: 1px solid var(--border); transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                                    <td style="padding: 1rem 1.5rem; font-weight: 600;">
+                                        <a href="/admin/users/<%= u.id %>" style="color: var(--primary); text-decoration: none;"><%= u.full_name %></a>
+                                    </td>
+                                    <td style="padding: 1rem 1.5rem;" dir="ltr"><%= u.phone %></td>
+                                    <td style="padding: 1rem 1.5rem;">
+                                        <% if(u.Role) { %>
+                                            <% if(u.Role.name === 'super_admin') { %><span class="badge badge-primary">مدير عام</span>
+                                            <% } else if(u.Role.name === 'employer') { %><span class="badge badge-warning">شركة</span>
+                                            <% } else { %><span class="badge" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-secondary);">باحث</span><% } %>
+                                        <% } else { %>-<% } %>
+                                    </td>
+                                    <td style="padding: 1rem 1.5rem;"><%= new Date(u.createdAt).toLocaleDateString('ar-EG') %></td>
+                                    <td style="padding: 1rem 1.5rem;">
+                                        <% if (u.is_banned) { %>
+                                            <span class="badge badge-danger">محظور</span>
+                                        <% } else { %>
+                                            <span class="badge badge-success">نشط</span>
+                                        <% } %>
+                                    </td>
+                                    <td style="padding: 1rem 1.5rem; text-align: center;">
+                                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                                            <a href="/admin/users/<%= u.id %>" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.85rem; border-color: var(--primary); color: var(--primary);">
+                                                عرض الملف 👁️
+                                            </a>
+                                            <% if (user.id !== u.id && u.Role && u.Role.name !== 'super_admin') { %>
+                                                <form action="/admin/users/<%= u.id %>/toggle-ban" method="POST" style="margin: 0;">
+                                                    <button type="submit" class="btn <%= u.is_banned ? 'btn-success' : 'btn-danger' %>" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">
+                                                        <%= u.is_banned ? 'رفع الحظر' : 'حظر' %>
+                                                    </button>
+                                                </form>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-secondary);">لا يوجد مستخدمين مطابقين للبحث.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+

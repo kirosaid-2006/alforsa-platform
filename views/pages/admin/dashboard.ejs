@@ -1,0 +1,68 @@
+<!-- Admin Navbar -->
+<%- include('../../partials/admin-sidebar', { path: '/admin' }) %>
+
+<!-- Main Content -->
+<div>
+    <h2 style="margin-bottom: 2rem;">نظرة عامة على النظام</h2>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--warning); margin-bottom: 0.5rem;"><%= locals.pendingCount || 0 %></div>
+            <div style="color: var(--text-secondary); font-weight: 600;">وظائف قيد المراجعة</div>
+            <a href="/admin/jobs/pending" class="btn btn-outline mt-2" style="padding: 0.25rem 1rem; font-size: 0.85rem;">مراجعة الآن</a>
+        </div>
+        
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;"><%= locals.activeJobsCount || 0 %></div>
+            <div style="color: var(--text-secondary); font-weight: 600;">وظائف نشطة</div>
+        </div>
+        
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center;">
+            <div style="font-size: 2.5rem; font-weight: 800; color: var(--success); margin-bottom: 0.5rem;"><%= locals.usersCount || 0 %></div>
+            <div style="color: var(--text-secondary); font-weight: 600;">إجمالي المستخدمين</div>
+        </div>
+    </div>
+
+    <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;">
+        <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">آخر عمليات استيراد من تليجرام</h3>
+        
+        <% if (locals.recentImports && recentImports.length > 0) { %>
+            <table style="width: 100%; text-align: right; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border);">
+                        <th style="padding: 0.75rem;">القناة</th>
+                        <th style="padding: 0.75rem;">الوقت</th>
+                        <th style="padding: 0.75rem;">الحالة</th>
+                        <th style="padding: 0.75rem;">نسبة الثقة (Grok AI)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% recentImports.forEach(imp => { %>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 0.75rem;"><%= imp.TelegramChannel ? imp.TelegramChannel.channel_name : 'غير معروف' %></td>
+                            <td style="padding: 0.75rem;"><%= new Date(imp.createdAt).toLocaleString('ar-EG') %></td>
+                            <td style="padding: 0.75rem;">
+                                <% if(imp.status === 'processed') { %><span class="badge badge-success">ناجح</span>
+                                <% } else if(imp.status === 'failed') { %><span class="badge badge-danger">فشل</span>
+                                <% } else if(imp.status === 'duplicate') { %><span class="badge badge-warning">مكرر</span>
+                                <% } else { %><span class="badge badge-primary">معلق</span><% } %>
+                            </td>
+                            <td style="padding: 0.75rem;">
+                                <% if(imp.confidence_score) { %>
+                                    <div style="width: 100%; background: #e2e8f0; border-radius: 5px; height: 8px;">
+                                        <div style="width: <%= imp.confidence_score * 100 %>%; background: <%= imp.confidence_score > 0.8 ? 'var(--success)' : 'var(--warning)' %>; height: 100%; border-radius: 5px;"></div>
+                                    </div>
+                                    <small><%= Math.round(imp.confidence_score * 100) %>%</small>
+                                <% } else { %>
+                                    -
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p class="text-center">لا توجد عمليات استيراد حديثة.</p>
+        <% } %>
+    </div>
+</div>

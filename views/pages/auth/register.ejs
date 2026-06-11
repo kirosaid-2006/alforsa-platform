@@ -1,0 +1,223 @@
+<div style="max-width: 800px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+    <div class="text-center mb-8">
+        <h1 style="color: var(--primary);">إنشاء حساب جديد</h1>
+        <p>سجل بياناتك مرة واحدة وابدأ في التقديم على آلاف الوظائف المتاحة</p>
+    </div>
+
+    <form action="/auth/register" method="POST" enctype="multipart/form-data">
+        <!-- 1. البيانات الشخصية -->
+        <h2 class="form-section-title">1. البيانات الشخصية</h2>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">الاسم بالكامل *</label>
+                <input type="text" name="full_name" class="form-control" required placeholder="الاسم رباعي">
+            </div>
+            <div class="form-group">
+                <label class="form-label">الرقم القومي (14 رقم) *</label>
+                <input type="text" name="national_id" class="form-control" required minlength="14" maxlength="14" pattern="[0-9٠-٩]{14}" title="يجب إدخال 14 رقم بالضبط" placeholder="xxxxxxxxxxxxxx">
+                <small style="color: var(--text-muted);">لن يتم مشاركة رقمك القومي مع الشركات</small>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">رقم الهاتف (11 رقم) *</label>
+                <input type="text" name="phone" class="form-control" required minlength="11" maxlength="11" pattern="[0-9٠-٩]{11}" title="يجب إدخال 11 رقم بالضبط" placeholder="مثال: 01xxxxxxxxx">
+            </div>
+            <div class="form-group">
+                <label class="form-label">رقم الواتساب (11 رقم) *</label>
+                <input type="text" name="whatsapp_phone" class="form-control" required minlength="11" maxlength="11" pattern="[0-9٠-٩]{11}" title="يجب إدخال 11 رقم بالضبط" placeholder="مثال: 01xxxxxxxxx">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">البريد الإلكتروني (اختياري للعمال / مطلوب للمؤهلات العليا)</label>
+            <input type="email" name="email" class="form-control" placeholder="example@email.com">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">كلمة المرور *</label>
+                <input type="password" name="password" class="form-control" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label class="form-label">تأكيد كلمة المرور *</label>
+                <input type="password" name="confirm_password" class="form-control" required minlength="6">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">تاريخ الميلاد *</label>
+                <input type="date" name="birth_date" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">النوع *</label>
+                <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+                    <div class="checkbox-group">
+                        <input type="radio" name="gender" value="male" id="gender_m" required>
+                        <label for="gender_m">ذكر</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" name="gender" value="female" id="gender_f" required>
+                        <label for="gender_f">أنثى</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">المحافظة *</label>
+                <select name="governorate_id" class="form-control" required>
+                    <option value="">اختر المحافظة...</option>
+                    <% if (locals.governorates) { %>
+                        <% governorates.forEach(gov => { %>
+                            <option value="<%= gov.id %>"><%= gov.name %></option>
+                        <% }) %>
+                    <% } %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">المدينة / المنطقة *</label>
+                <input type="text" name="city" class="form-control" required placeholder="مثال: مدينة نصر، شبرا، طنطا">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">العنوان التفصيلي (اختياري)</label>
+                <input type="text" name="detailed_address" class="form-control" placeholder="الشارع، رقم العمارة، إلخ...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">اسم الكنيسة التابع لها (اختياري)</label>
+                <input type="text" name="church_name" class="form-control" placeholder="مثال: كنيسة العذراء مريم بـ...">
+            </div>
+        </div>
+
+        <!-- 2. البيانات التعليمية -->
+        <h2 class="form-section-title">2. البيانات التعليمية</h2>
+        
+        <div class="form-group">
+            <label class="form-label">المؤهل الدراسي *</label>
+            <select name="qualification" class="form-control" required>
+                <option value="">اختر المؤهل...</option>
+                <option value="none">بدون مؤهل / محو أمية</option>
+                <option value="diploma">دبلوم / مؤهل متوسط</option>
+                <option value="institute">معهد / مؤهل فوق متوسط</option>
+                <option value="bachelors">بكالوريوس / ليسانس</option>
+                <option value="masters">ماجستير</option>
+                <option value="phd">دكتوراه</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">الكلية أو المعهد (إن وجد)</label>
+                <select name="college_institute" class="form-control">
+                    <option value="">أخرى / غير محدد</option>
+                    <option value="تجارة">تجارة</option>
+                    <option value="آداب">آداب</option>
+                    <option value="حقوق">حقوق</option>
+                    <option value="تربية">تربية</option>
+                    <option value="هندسة">هندسة</option>
+                    <option value="حاسبات ومعلومات">حاسبات ومعلومات / ذكاء اصطناعي</option>
+                    <option value="طب البشري">طب بشري</option>
+                    <option value="طب أسنان">طب أسنان</option>
+                    <option value="صيدلة">صيدلة</option>
+                    <option value="علوم">علوم</option>
+                    <option value="زراعة">زراعة</option>
+                    <option value="سياحة وفنادق">سياحة وفنادق</option>
+                    <option value="ألسن">ألسن / لغات وترجمة</option>
+                    <option value="إعلام">إعلام</option>
+                    <option value="خدمة اجتماعية">خدمة اجتماعية</option>
+                    <option value="تمريض">تمريض</option>
+                    <option value="فنون تطبيقية">فنون تطبيقية / جميلة</option>
+                    <option value="معهد فني تجاري">معهد فني تجاري</option>
+                    <option value="معهد فني صناعي">معهد فني صناعي</option>
+                    <option value="معهد تكنولوجي">معهد تكنولوجي عالي</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">التخصص</label>
+                <input type="text" name="specialization" class="form-control">
+            </div>
+        </div>
+
+        <!-- 3. الحالة الوظيفية -->
+        <h2 class="form-section-title">3. الحالة الوظيفية</h2>
+        <div class="form-group">
+            <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                <div class="checkbox-group">
+                    <input type="radio" name="employment_status" value="seeking" id="status_seeking" required>
+                    <label for="status_seeking">أبحث عن عمل حالياً</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="radio" name="employment_status" value="employed" id="status_employed" required>
+                    <label for="status_employed">أعمل حالياً (وأبحث عن فرصة أفضل)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="radio" name="employment_status" value="student" id="status_student" required>
+                    <label for="status_student">طالب</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. الخبرة العملية -->
+        <h2 class="form-section-title">4. الخبرة العملية</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">سنوات الخبرة *</label>
+                <select name="experience_level" class="form-control" required>
+                    <option value="">اختر...</option>
+                    <option value="none">بدون خبرة</option>
+                    <option value="less_than_year">أقل من سنة</option>
+                    <option value="1_3_years">من 1 إلى 3 سنوات</option>
+                    <option value="3_5_years">من 3 إلى 5 سنوات</option>
+                    <option value="more_than_5">أكثر من 5 سنوات</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">الوظيفة الحالية أو آخر وظيفة (اختياري)</label>
+                <input type="text" name="last_job_title" class="form-control">
+            </div>
+        </div>
+
+        <!-- 5. رفع الملفات -->
+        <h2 class="form-section-title">5. السيرة الذاتية (اختياري)</h2>
+        <div class="form-group" style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px dashed var(--border);">
+            <label class="form-label">رفع السيرة الذاتية (CV) - غير إجباري</label>
+            <input type="file" name="cv_file" class="form-control" accept=".pdf,.doc,.docx" style="background: white;">
+            <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">يمكنك التقديم على العديد من الوظائف (مثل العمال والسائقين) بدون سيرة ذاتية.</small>
+        </div>
+
+        <!-- 6. الموافقات (إجبارية) -->
+        <h2 class="form-section-title">6. الإقرارات والموافقات</h2>
+        
+        <div class="checkbox-group" style="background: var(--bg-body); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <input type="checkbox" name="consent_save_data" id="consent1" required>
+            <label for="consent1" style="font-weight: 600; color: var(--text-primary);">أوافق على حفظ بياناتي في منصة "فرصة" لمساعدتي في التقديم للوظائف بسهولة.</label>
+        </div>
+        
+        <div class="checkbox-group" style="background: var(--warning-bg); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
+            <input type="checkbox" name="consent_disclaimer" id="consent2" required>
+            <label for="consent2" style="font-weight: 600; color: var(--text-primary);">
+                أقر بأن الكنيسة والمنصة غير مسئولتين عن أي إجراءات توظيف، ولا عن المرتبات، وأن دور المنصة هو التوصيل المجاني فقط بيني وبين الشركات المعلنة. (إخلاء مسؤولية)
+            </label>
+        </div>
+
+        <div class="checkbox-group" style="background: var(--bg-body); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <input type="checkbox" name="consent_notifications" id="consent3" required>
+            <label for="consent3" style="font-weight: 600; color: var(--text-primary);">أوافق على استلام تنبيهات وإشعارات دورية لمتابعة حالة توظيفي والرد على استبيان التوظيف بعد 15 يوماً من التقديم.</label>
+        </div>
+
+        <div class="mt-8">
+            <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.25rem; padding: 1rem;">إنشاء الحساب الآن 🚀</button>
+        </div>
+        
+        <div class="text-center mt-4">
+            لديك حساب بالفعل؟ <a href="/auth/login" style="font-weight: 700;">تسجيل الدخول</a>
+        </div>
+    </form>
+</div>

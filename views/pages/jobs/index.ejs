@@ -1,0 +1,116 @@
+<!-- Jobs Page -->
+    <!-- Compact Navbar Filter -->
+    <div style="background: var(--bg-surface); border-bottom: 1px solid var(--border); padding: 1rem; margin-bottom: 1.5rem; position: sticky; top: 70px; z-index: 40; border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+        <form action="/jobs" method="GET" style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+            <input type="text" name="q" class="form-control" style="flex: 2; min-width: 200px; height: 48px; margin-bottom: 0;" placeholder="بحث: مهندس، محاسب..." value="<%= typeof query !== 'undefined' ? query.q : '' %>">
+            
+            <select name="cat" class="form-control" style="flex: 1; min-width: 140px; height: 48px; margin-bottom: 0;">
+                <option value="">التخصص</option>
+                <% if (locals.categories) { %>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category.id %>" <%= typeof query !== 'undefined' && query.cat == category.id ? 'selected' : '' %>><%= category.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+
+            <select name="gov" class="form-control" style="flex: 1; min-width: 140px; height: 48px; margin-bottom: 0;">
+                <option value="">المحافظة</option>
+                <% if (locals.governorates) { %>
+                    <% governorates.forEach(gov => { %>
+                        <option value="<%= gov.id %>" <%= typeof query !== 'undefined' && query.gov == gov.id ? 'selected' : '' %>><%= gov.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+            
+            <select name="qual" class="form-control" style="flex: 1; min-width: 140px; height: 48px; margin-bottom: 0;">
+                <option value="">المؤهل</option>
+                <option value="none" <%= typeof query !== 'undefined' && query.qual === 'none' ? 'selected' : '' %>>بدون مؤهل</option>
+                <option value="diploma" <%= typeof query !== 'undefined' && query.qual === 'diploma' ? 'selected' : '' %>>متوسط</option>
+                <option value="institute" <%= typeof query !== 'undefined' && query.qual === 'institute' ? 'selected' : '' %>>فوق متوسط</option>
+                <option value="bachelors" <%= typeof query !== 'undefined' && query.qual === 'bachelors' ? 'selected' : '' %>>عالي</option>
+            </select>
+            
+            <select name="exp" class="form-control" style="flex: 1; min-width: 120px; height: 48px; margin-bottom: 0;">
+                <option value="">الخبرة</option>
+                <option value="none" <%= typeof query !== 'undefined' && query.exp === 'none' ? 'selected' : '' %>>بدون خبرة</option>
+                <option value="1" <%= typeof query !== 'undefined' && query.exp === '1' ? 'selected' : '' %>>سنة+</option>
+                <option value="3" <%= typeof query !== 'undefined' && query.exp === '3' ? 'selected' : '' %>>3 سنوات+</option>
+                <option value="5" <%= typeof query !== 'undefined' && query.exp === '5' ? 'selected' : '' %>>5 سنوات+</option>
+            </select>
+            
+            <div style="display: flex; gap: 0.5rem; flex: 1; min-width: 150px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1; height: 48px; padding: 0;">بحث</button>
+                <% if (typeof query !== 'undefined' && Object.keys(query).length > 0) { %>
+                    <a href="/jobs" class="btn btn-outline" style="height: 48px; padding: 0 1rem; border-color: var(--danger); color: var(--danger) !important; background: var(--danger-bg);" title="إلغاء الفلاتر">✖</a>
+                <% } %>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div class="jobs-list">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2><%= typeof categoryName !== 'undefined' ? 'وظائف ' + categoryName : 'أحدث الوظائف المتاحة' %></h2>
+            <span style="color: var(--text-muted);"><%= locals.jobs ? jobs.length : 0 %> وظيفة</span>
+        </div>
+
+        <% if (locals.jobs && jobs.length > 0) { %>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+                <% jobs.forEach(job => { %>
+                    <div class="job-card" style="flex-direction: column; display: flex; height: 100%;">
+                        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+                            <div class="job-logo" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                                <%= job.company_name ? job.company_name.substring(0, 1) : 'ش' %>
+                            </div>
+                            <div class="job-content" style="flex: 1;">
+                                <a href="/jobs/<%= job.slug %>" class="job-title" style="font-size: 1.1rem; margin-bottom: 0.25rem;"><%= job.title %></a>
+                                <div class="job-company" style="font-size: 0.85rem;">
+                                    🏢 <%= job.company_name %> 
+                                    <% if (job.governorate) { %> | 📍 <%= job.governorate.name %> <% if (job.city) { %> - <%= job.city %> <% } %> <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="job-meta" style="margin-bottom: 1rem; gap: 0.5rem; flex-wrap: wrap;">
+                            <% if (job.category) { %>
+                                <span class="badge" style="<%= job.category.color ? job.category.color.replace('bg-', 'background: var(--').replace('text-', 'color: var(--') : 'background: #e0f2fe; color: #0369a1;' %>">
+                                    <%= job.category.name %>
+                                </span>
+                            <% } %>
+                            <% if (job.qualification === 'none') { %>
+                                <span class="badge badge-warning">بدون مؤهل</span>
+                            <% } %>
+                            <span class="badge" style="background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted);">🕒 <%= new Date(job.published_at || job.createdAt).toLocaleDateString('ar-EG') %></span>
+                        </div>
+                        
+                        <div class="job-actions" style="margin-top: auto; display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem;">
+                            <div class="job-salary" style="text-align: center; color: var(--primary); font-weight: bold;">
+                                <% if (job.show_salary && (job.salary_min || job.salary_max)) { %>
+                                    <%= job.salary_min || 0 %> - <%= job.salary_max || 'غير محدد' %> ج.م
+                                <% } else { %>
+                                    الراتب يحدد بالمقابلة
+                                <% } %>
+                            </div>
+                            <a href="/jobs/<%= job.slug %>" class="btn btn-primary" style="padding: 0.5rem; text-align: center;">التفاصيل والتقديم</a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            
+            <!-- Pagination stub -->
+            <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+                <a href="#" class="btn btn-outline">السابق</a>
+                <a href="#" class="btn btn-primary">1</a>
+                <a href="#" class="btn btn-outline">2</a>
+                <a href="#" class="btn btn-outline">التالي</a>
+            </div>
+            
+        <% } else { %>
+            <div style="text-align: center; padding: 4rem 0; background: white; border-radius: var(--radius); border: 1px solid var(--border);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                <h3>لم نتمكن من العثور على وظائف تطابق بحثك</h3>
+                <p>حاول تغيير فلاتر البحث أو تصفح كل الوظائف المتاحة.</p>
+                <a href="/jobs" class="btn btn-primary mt-2">عرض كل الوظائف</a>
+            </div>
+        <% } %>
+    </div>

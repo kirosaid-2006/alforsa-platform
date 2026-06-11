@@ -1,0 +1,171 @@
+<!-- Employer Navbar -->
+<div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 2rem; padding: 0.5rem; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    
+    <div style="display: flex; align-items: center; gap: 1rem; padding-right: 1rem;">
+        <div style="width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            🏢
+        </div>
+        <div>
+            <h3 style="margin: 0; font-size: 1.1rem;"><%= user.full_name %></h3>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">صاحب عمل</p>
+        </div>
+    </div>
+
+    <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 0.5rem; flex-wrap: wrap;">
+        <li>
+            <a href="/employer" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--text-secondary); font-weight: 600; background: transparent; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">📊</span> لوحة التحكم
+            </a>
+        </li>
+        <li>
+            <a href="/employer/jobs" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--text-secondary); font-weight: 600; background: transparent; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">💼</span> وظائفي المنشورة
+            </a>
+        </li>
+        <li>
+            <a href="/employer/post-job" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--primary); font-weight: 700; background: var(--primary-light); transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">➕</span> نشر وظيفة
+            </a>
+        </li>
+        <li>
+            <a href="/auth/logout" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--danger); font-weight: 600; background: transparent; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">🚪</span> خروج
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div style="max-width: 900px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+    
+    <div class="mb-8 border-bottom pb-4" style="border-bottom: 1px solid var(--border);">
+        <h1 style="color: var(--primary); margin-bottom: 0.5rem;">نشر وظيفة جديدة</h1>
+        <p style="color: var(--text-secondary);">املأ بيانات الوظيفة لتعرض على آلاف الباحثين عن عمل مجاناً.</p>
+        <div class="alert-banner mt-4" style="background: var(--warning-bg); color: var(--warning); border: 1px solid #fde68a;">
+            ⚠️ سيتم مراجعة الوظيفة من قبل الإدارة قبل نشرها على المنصة لضمان المصداقية.
+        </div>
+    </div>
+
+    <form action="/employer/post-job" method="POST" enctype="multipart/form-data">
+        <!-- 1. الأساسيات -->
+        <h2 class="form-section-title" style="margin-top: 0;">1. البيانات الأساسية للوظيفة</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">المسمى الوظيفي *</label>
+                <input type="text" name="title" class="form-control" required placeholder="مثال: محاسب مالي، عامل إنتاج، سائق رخصة مهنية...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">التصنيف *</label>
+                <select name="category_id" class="form-control" required>
+                    <option value="">اختر التصنيف الأقرب...</option>
+                    <% if (locals.categories) { %>
+                        <% categories.forEach(cat => { %>
+                            <option value="<%= cat.id %>"><%= cat.name %></option>
+                        <% }) %>
+                    <% } %>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">اسم الشركة أو المصنع *</label>
+            <input type="text" name="company_name" class="form-control" required placeholder="الاسم الذي سيظهر للباحثين">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">المحافظة *</label>
+                <select name="governorate_id" class="form-control" required>
+                    <option value="">اختر المحافظة...</option>
+                    <% if (locals.governorates) { %>
+                        <% governorates.forEach(gov => { %>
+                            <option value="<%= gov.id %>"><%= gov.name %></option>
+                        <% }) %>
+                    <% } %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">المدينة / المنطقة *</label>
+                <input type="text" name="city" class="form-control" required placeholder="مثال: العاشر من رمضان، أكتوبر، شبرا...">
+            </div>
+        </div>
+
+        <!-- 2. التفاصيل -->
+        <h2 class="form-section-title">2. تفاصيل الوظيفة والشروط</h2>
+        <div class="form-group">
+            <label class="form-label">وصف الوظيفة ومواعيد العمل *</label>
+            <textarea name="description" class="form-control" rows="5" required placeholder="اكتب تفاصيل مهام الوظيفة، مواعيد العمل (مثال: من 9 ص إلى 5 م)، وأيام الإجازات..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">الشروط والمتطلبات (اختياري)</label>
+            <textarea name="requirements" class="form-control" rows="4" placeholder="شروط السن، المهارات المطلوبة، التفرغ..."></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">المؤهل المطلوب *</label>
+                <select name="qualification" class="form-control" required>
+                    <option value="none">بدون مؤهل / يقرأ ويكتب</option>
+                    <option value="diploma">دبلوم / صنايع / تجارة</option>
+                    <option value="institute">معهد</option>
+                    <option value="bachelors">بكالوريوس / ليسانس فأعلى</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">الخبرة المطلوبة *</label>
+                <select name="experience" class="form-control" required>
+                    <option value="0">بدون خبرة (حديث التخرج)</option>
+                    <option value="1">سنة على الأقل</option>
+                    <option value="3">3 سنوات على الأقل</option>
+                    <option value="5">5 سنوات فأكثر</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row" style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <div class="form-group" style="margin: 0;">
+                <label class="form-label">الراتب الشهري (ج.م) - يفضل إضافته لزيادة التقديمات</label>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="number" name="salary_min" class="form-control" placeholder="من (مثال: 4000)">
+                    <span>-</span>
+                    <input type="number" name="salary_max" class="form-control" placeholder="إلى (مثال: 6000)">
+                </div>
+                <div class="checkbox-group mt-2">
+                    <input type="checkbox" name="show_salary" id="show_salary" checked value="true">
+                    <label for="show_salary">عرض الراتب للباحثين</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. بيانات التواصل (مخفية) -->
+        <h2 class="form-section-title">3. بيانات التواصل (لن تظهر إلا للمهتمين)</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">سيتم إخفاء هذه البيانات، ولن يراها سوى الباحث الذي يضغط على زر "تقديم" لحمايتك من الاتصالات العشوائية.</p>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">رقم هاتف الاتصال *</label>
+                <input type="text" name="contact_phone" class="form-control" required pattern="[0-9]{11,12}" placeholder="01xxxxxxxxx">
+            </div>
+            <div class="form-group">
+                <label class="form-label">رقم الواتساب (اختياري)</label>
+                <input type="text" name="contact_whatsapp" class="form-control" pattern="[0-9]{11,12}" placeholder="01xxxxxxxxx">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">عنوان المقابلة أو تفاصيل إضافية للتواصل (اختياري)</label>
+            <textarea name="contact_info" class="form-control" rows="2" placeholder="العنوان الدقيق لإجراء المقابلة، أو مواعيد الاتصال..."></textarea>
+        </div>
+
+        <h2 class="form-section-title">4. صورة الإعلان (اختياري)</h2>
+        <div class="form-group" style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px dashed var(--border); margin-bottom: 2rem;">
+            <label class="form-label">صورة إعلان الوظيفة أو لوجو الشركة</label>
+            <input type="file" name="job_image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp" style="background: white;">
+            <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">إذا كان لديك صورة مصممة للإعلان، يمكنك رفعها هنا لتظهر للباحثين عن عمل.</small>
+        </div>
+
+        <div class="mt-8">
+            <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.25rem; padding: 1rem;">نشر الوظيفة الآن 🚀</button>
+        </div>
+    </form>
+</div>

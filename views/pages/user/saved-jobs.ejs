@@ -1,0 +1,38 @@
+<!-- User Navbar -->
+<%- include('../../partials/user-sidebar', { path: '/user/saved-jobs' }) %>
+
+<!-- Main Content -->
+<div>
+        <h2 style="margin-bottom: 2rem;">الوظائف المحفوظة 🔖</h2>
+
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+            
+            <% if (locals.savedJobs && savedJobs.length > 0) { %>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <% savedJobs.forEach(job => { %>
+                        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin-bottom: 0.5rem; font-size: 1.25rem;">
+                                    <a href="/jobs/<%= job.slug %>"><%= job.title %></a>
+                                </h4>
+                                <div style="color: var(--text-secondary); font-size: 0.95rem;">
+                                    🏢 <%= job.company_name %> | 📍 <%= job.governorate ? job.governorate.name : '' %>
+                                </div>
+                            </div>
+                            <div>
+                                <a href="/jobs/<%= job.slug %>" class="btn btn-outline">عرض التفاصيل</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-8">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🔖</div>
+                    <p style="font-size: 1.1rem; color: var(--text-secondary);">لا توجد أي وظائف محفوظة حالياً.</p>
+                    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">يمكنك حفظ الوظائف التي تهمك للرجوع إليها لاحقاً.</p>
+                    <a href="/jobs" class="btn btn-primary" style="padding: 0.75rem 2rem;">تصفح الوظائف المتاحة</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+

@@ -1,0 +1,34 @@
+<header class="site-header">
+    <div class="container navbar">
+        <a href="/" class="nav-brand">
+            <span class="icon">🎯</span> فرصة
+        </a>
+        
+        <nav class="nav-links">
+            <a href="/" class="<%= typeof path !== 'undefined' && path === '/' ? 'active' : '' %>">الرئيسية</a>
+            <a href="/jobs" class="<%= typeof path !== 'undefined' && path === '/jobs' ? 'active' : '' %>">تصفح الوظائف</a>
+            <a href="/about">عن المنصة</a>
+        </nav>
+
+        <div class="nav-auth">
+            <% if (locals.user) { %>
+                <span style="color: var(--text-secondary); font-weight: 600;">
+                    مرحباً، <%= user.full_name.split(' ')[0] %>
+                </span>
+                
+                <% if (user.Role && user.Role.name === 'admin' || user.Role && user.Role.name === 'super_admin') { %>
+                    <a href="/admin" class="btn btn-outline" style="padding: 0.4rem 1rem;">لوحة الإدارة</a>
+                <% } else if (user.Role && user.Role.name === 'employer') { %>
+                    <a href="/employer" class="btn btn-outline" style="padding: 0.4rem 1rem;">لوحة الشركة</a>
+                <% } else { %>
+                    <a href="/user/dashboard" class="btn btn-outline" style="padding: 0.4rem 1rem;">حسابي</a>
+                <% } %>
+                
+                <a href="/auth/logout" style="color: var(--danger); font-weight: 600;">تسجيل الخروج</a>
+            <% } else { %>
+                <a href="/auth/login" style="color: var(--text-secondary); font-weight: 600;">دخول</a>
+                <a href="/auth/register" class="btn btn-primary">حساب جديد</a>
+            <% } %>
+        </div>
+    </div>
+</header>

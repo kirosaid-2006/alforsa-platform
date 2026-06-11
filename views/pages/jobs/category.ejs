@@ -1,0 +1,154 @@
+<%
+  var catInfo = typeof category !== 'undefined' ? category : {};
+  locals.title = catInfo.name_ar || catInfo.name || 'تصنيف الوظائف';
+  locals.activePage = 'jobs';
+%>
+
+<div class="container" style="margin-top: var(--space-md);">
+  <!-- Category Header -->
+  <div class="category-header">
+    <div class="cat-icon-lg" style="background: <%= catInfo.bg_color || 'var(--primary-light)' %>;">
+      <span><%= catInfo.icon || '📁' %></span>
+    </div>
+    <div>
+      <h1><%= catInfo.name_ar || catInfo.name || 'تصنيف' %></h1>
+      <p><%= typeof totalJobs !== 'undefined' ? totalJobs : 0 %> وظيفة متاحة في هذا التصنيف</p>
+    </div>
+  </div>
+
+  <div class="page-grid">
+    <!-- Sidebar Filters -->
+    <aside>
+      <form class="filter-panel" action="/jobs/category/<%= catInfo.slug || catInfo.id || '' %>" method="GET" id="filterForm">
+        <h3>🔍 فلترة النتائج</h3>
+
+        <!-- Governorate -->
+        <div class="filter-group">
+          <label for="governorate_id">المحافظة</label>
+          <select name="governorate_id" id="governorate_id" class="form-control">
+            <option value="">كل المحافظات</option>
+            <% if (typeof governorates !== 'undefined' && governorates) { %>
+              <% governorates.forEach(function(gov) { %>
+                <option value="<%= gov.id %>" <%= typeof query !== 'undefined' && query.governorate_id == gov.id ? 'selected' : '' %>><%= gov.name_ar %></option>
+              <% }) %>
+            <% } else { %>
+              <option value="1">القاهرة</option>
+              <option value="2">الجيزة</option>
+              <option value="3">الإسكندرية</option>
+            <% } %>
+          </select>
+        </div>
+
+        <!-- Qualification -->
+        <div class="filter-group">
+          <label for="qualification">المؤهل الدراسي</label>
+          <select name="qualification" id="qualification" class="form-control">
+            <option value="">كل المؤهلات</option>
+            <option value="none" <%= typeof query !== 'undefined' && query.qualification === 'none' ? 'selected' : '' %>>بدون مؤهل</option>
+            <option value="diploma" <%= typeof query !== 'undefined' && query.qualification === 'diploma' ? 'selected' : '' %>>دبلوم</option>
+            <option value="institute" <%= typeof query !== 'undefined' && query.qualification === 'institute' ? 'selected' : '' %>>معهد</option>
+            <option value="bachelor" <%= typeof query !== 'undefined' && query.qualification === 'bachelor' ? 'selected' : '' %>>بكالوريوس</option>
+            <option value="master" <%= typeof query !== 'undefined' && query.qualification === 'master' ? 'selected' : '' %>>ماجستير</option>
+            <option value="phd" <%= typeof query !== 'undefined' && query.qualification === 'phd' ? 'selected' : '' %>>دكتوراه</option>
+          </select>
+        </div>
+
+        <!-- Experience Level -->
+        <div class="filter-group">
+          <label for="experience_level">مستوى الخبرة</label>
+          <select name="experience_level" id="experience_level" class="form-control">
+            <option value="">كل المستويات</option>
+            <option value="none" <%= typeof query !== 'undefined' && query.experience_level === 'none' ? 'selected' : '' %>>بدون خبرة</option>
+            <option value="less_than_1" <%= typeof query !== 'undefined' && query.experience_level === 'less_than_1' ? 'selected' : '' %>>أقل من سنة</option>
+            <option value="1_3" <%= typeof query !== 'undefined' && query.experience_level === '1_3' ? 'selected' : '' %>>1 - 3 سنوات</option>
+            <option value="3_5" <%= typeof query !== 'undefined' && query.experience_level === '3_5' ? 'selected' : '' %>>3 - 5 سنوات</option>
+            <option value="more_than_5" <%= typeof query !== 'undefined' && query.experience_level === 'more_than_5' ? 'selected' : '' %>>أكثر من 5 سنوات</option>
+          </select>
+        </div>
+
+        <!-- Salary Range -->
+        <div class="filter-group">
+          <label>نطاق الراتب (ج.م)</label>
+          <div class="salary-range">
+            <input type="number" name="salary_min" class="form-control" placeholder="من" value="<%= typeof query !== 'undefined' && query.salary_min ? query.salary_min : '' %>" min="0">
+            <span>—</span>
+            <input type="number" name="salary_max" class="form-control" placeholder="إلى" value="<%= typeof query !== 'undefined' && query.salary_max ? query.salary_max : '' %>" min="0">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: var(--space-md);">تطبيق الفلاتر</button>
+        <a href="/jobs/category/<%= catInfo.slug || catInfo.id || '' %>" class="btn btn-text btn-block" style="margin-top: var(--space-sm);">مسح الفلاتر</a>
+      </form>
+    </aside>
+
+    <!-- Main Content -->
+    <div>
+      <!-- Results Header -->
+      <div class="results-header">
+        <div class="results-count">
+          عرض <strong><%= typeof totalJobs !== 'undefined' ? totalJobs : 0 %></strong> وظيفة في <%= catInfo.name_ar || catInfo.name || 'هذا التصنيف' %>
+        </div>
+        <div class="sort-options">
+          <label>ترتيب حسب:</label>
+          <select name="sort" onchange="this.form.submit()" form="filterForm">
+            <option value="newest">الأحدث</option>
+            <option value="salary_desc">الراتب (الأعلى)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Job Cards -->
+      <div class="job-cards">
+        <% if (typeof jobs !== 'undefined' && jobs && jobs.length > 0) { %>
+          <% jobs.forEach(function(job) { %>
+            <a href="/jobs/<%= job.id %>" class="job-card">
+              <div class="job-card-logo"><%= job.company_name ? job.company_name.charAt(0) : 'ش' %></div>
+              <div class="job-card-content">
+                <div class="job-card-title"><%= job.title %></div>
+                <div class="job-card-company"><%= job.company_name || 'شركة غير محددة' %></div>
+                <div class="job-card-meta">
+                  <span>📍 <%= job.governorate_name || (job.Governorate ? job.Governorate.name_ar : 'غير محدد') %></span>
+                </div>
+                <div class="job-card-footer">
+                  <% if (job.show_salary && (job.salary_min || job.salary_max)) { %>
+                    <span class="job-salary">💵 <%= job.salary_min || '' %><% if(job.salary_min && job.salary_max) { %> - <% } %><%= job.salary_max || '' %> ج.م</span>
+                  <% } else { %>
+                    <span class="job-salary">💵 الراتب عند المقابلة</span>
+                  <% } %>
+                  <span class="btn btn-primary btn-sm">تقديم</span>
+                </div>
+              </div>
+            </a>
+          <% }) %>
+        <% } else { %>
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>لا توجد وظائف في هذا التصنيف حالياً</h3>
+            <p>جرّب البحث في تصنيفات أخرى</p>
+            <a href="/jobs" class="btn btn-outline">تصفح كل الوظائف</a>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+        <div class="pagination">
+          <% var currentPage = typeof page !== 'undefined' ? parseInt(page) : 1; %>
+          <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>">→ السابق</a>
+          <% } %>
+          <% for (var i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+              <span class="active"><%= i %></span>
+            <% } else if (Math.abs(i - currentPage) <= 2 || i === 1 || i === totalPages) { %>
+              <a href="?page=<%= i %>"><%= i %></a>
+            <% } %>
+          <% } %>
+          <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>">التالي ←</a>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>

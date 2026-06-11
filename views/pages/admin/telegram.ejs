@@ -1,0 +1,89 @@
+<!-- Admin Navbar -->
+<%- include('../../partials/admin-sidebar', { path: '/admin/telegram' }) %>
+
+<!-- Main Content -->
+<div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="margin: 0;">إدارة قنوات تليجرام 🤖</h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+            
+            <!-- Add Form -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; height: fit-content; box-shadow: var(--shadow-sm);">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.25rem;">إضافة قناة جديدة</h3>
+                <form action="/admin/telegram" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">اسم القناة (للعرض)</label>
+                        <input type="text" name="channel_name" class="form-control" required placeholder="مثال: وظائف مصانع العبور">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">رابط أو معرف القناة (Username)</label>
+                        <input type="text" name="channel_username" class="form-control" required placeholder="مثال: @jobs_egypt">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">معرف القناة الداخلي (ID) - اختياري</label>
+                        <input type="text" name="channel_id" class="form-control" placeholder="مثال: -1001234567890">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">إضافة القناة</button>
+                </form>
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-body); border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--text-secondary);">
+                    <strong>💡 معلومة:</strong> سيقوم الذكاء الاصطناعي (Grok) آلياً بقراءة الوظائف من هذه القنوات، تحليلها، واستخراج بياناتها (المسمى، الراتب، المكان) ليتم مراجعتها من قبلك.
+                </div>
+            </div>
+
+            <!-- Channels List -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);">
+                <table style="width: 100%; text-align: right; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border);">
+                            <th style="padding: 1rem;">اسم القناة</th>
+                            <th style="padding: 1rem;">المعرف</th>
+                            <th style="padding: 1rem; text-align: center;">عدد الوظائف المسحوبة</th>
+                            <th style="padding: 1rem; text-align: center;">الحالة</th>
+                            <th style="padding: 1rem; text-align: center;">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (locals.channels && channels.length > 0) { %>
+                            <% channels.forEach(ch => { %>
+                                <tr style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 1rem; font-weight: 600;"><%= ch.channel_name %></td>
+                                    <td style="padding: 1rem;" dir="ltr"><%= ch.channel_username %></td>
+                                    <td style="padding: 1rem; text-align: center;">
+                                        <span class="badge badge-primary"><%= ch.jobs_created || 0 %></span>
+                                    </td>
+                                    <td style="padding: 1rem; text-align: center;">
+                                        <% if (ch.is_active) { %>
+                                            <span class="badge badge-success">تعمل</span>
+                                        <% } else { %>
+                                            <span class="badge badge-danger">متوقفة</span>
+                                        <% } %>
+                                    </td>
+                                    <td style="padding: 1rem; text-align: center;">
+                                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                                            <form action="/admin/telegram/<%= ch.id %>/toggle" method="POST" style="margin: 0;">
+                                                <button type="submit" class="btn <%= ch.is_active ? 'btn-danger' : 'btn-success' %>" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">
+                                                    <%= ch.is_active ? 'إيقاف' : 'تفعيل' %>
+                                                </button>
+                                            </form>
+                                            <% if (ch.is_active) { %>
+                                                <a href="/admin/telegram/<%= ch.id %>/test-pull" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border-color: var(--primary); color: var(--primary);">
+                                                    سحب الآن 🔄
+                                                </a>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-secondary);">لا توجد قنوات تليجرام مسجلة حتى الآن.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+

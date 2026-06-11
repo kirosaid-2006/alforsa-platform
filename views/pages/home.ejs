@@ -1,0 +1,100 @@
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>ابحث عن فرصتك القادمة في فرصة</h1>
+        <p>المنصة الموثوقة لتوصيل الكفاءات بالشركات المناسبة في جميع أنحاء مصر بطريقة آمنة وسريعة.</p>
+        
+        <form action="/jobs" method="GET" class="search-box">
+            <input type="text" name="q" class="search-input" placeholder="ابحث عن وظيفة (مثال: محاسب، سائق، فرد أمن)...">
+            <select name="gov" class="search-select">
+                <option value="">كل المحافظات</option>
+                <% if (locals.governorates) { %>
+                    <% governorates.forEach(gov => { %>
+                        <option value="<%= gov.id %>"><%= gov.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+            <button type="submit" class="search-btn">ابحث الآن</button>
+        </form>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-12" style="background: white; border-bottom: 1px solid var(--border);">
+    <div class="container text-center">
+        <h2 style="margin-bottom: 3rem;">كيف تحصل على وظيفتك في 3 خطوات بسيطة؟</h2>
+        <div class="steps-grid">
+            <div class="step-card" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="step-icon" style="color: var(--primary);">📝</div>
+                <h3>1. أنشئ حسابك مجاناً</h3>
+                <p>سجل بياناتك ومؤهلاتك مرة واحدة فقط لتتمكن من التقديم على أي وظيفة بضغطة زر واحدة.</p>
+            </div>
+            <div class="step-card" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="step-icon" style="color: var(--success);">🔍</div>
+                <h3>2. تصفح  الوظائف</h3>
+                <p>ابحث عن الوظائف المناسبة لمحافظتك وتخصصك من بين الفرص المتاحة والمحدثة يومياً.</p>
+            </div>
+            <div class="step-card" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="step-icon" style="color: var(--warning);">🚀</div>
+                <h3>3. تواصل مع الشركات</h3>
+                <p>اضغط على "تقديم" لرؤية أرقام هواتف الشركات والمصانع والتواصل معهم مباشرة للتعيين.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-16">
+    <div class="container">
+        <h2 class="text-center mb-8">تصفح الوظائف حسب التخصص</h2>
+        <div class="categories-grid">
+            <% if (locals.categories && categories.length > 0) { %>
+                <% categories.forEach(cat => { %>
+                    <a href="/jobs/category/<%= cat.slug %>" class="category-card <%= cat.slug === 'accounting-finance' ? 'cat-accounting' : cat.slug === 'manual-labor' ? 'cat-labor' : '' %>" style="text-decoration: none;">
+                        <span class="category-icon"><%= cat.icon %></span>
+                        <h3><%= cat.name %></h3>
+                        <p><%= cat.jobs_count || 0 %> وظيفة متاحة</p>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <!-- Fallback Mock Data -->
+                <a href="/jobs?category=accounting" class="category-card cat-accounting"><span class="category-icon">📊</span><h3>محاسبين ومالية</h3><p>120 وظيفة</p></a>
+                <a href="/jobs?category=labor" class="category-card cat-labor"><span class="category-icon">👷</span><h3>عمال بدون شهادة</h3><p>350 وظيفة</p></a>
+                <a href="/jobs?category=security" class="category-card"><span class="category-icon">🛡️</span><h3>أفراد أمن وحراسة</h3><p>200 وظيفة</p></a>
+                <a href="/jobs?category=drivers" class="category-card"><span class="category-icon">🚗</span><h3>سائقين</h3><p>150 وظيفة</p></a>
+                <a href="/jobs?category=technicians" class="category-card"><span class="category-icon">🔧</span><h3>فنيين وحرفيين</h3><p>180 وظيفة</p></a>
+                <a href="/jobs?category=sales" class="category-card"><span class="category-icon">🛒</span><h3>مبيعات ومشتريات</h3><p>210 وظيفة</p></a>
+            <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- Protection & Disclaimer Section -->
+<section class="py-16" style="background: white;">
+    <div class="container two-col-layout" style="align-items: center;">
+        <div style="padding-left: 2rem;">
+            <h2 style="color: var(--primary); margin-bottom: 1.5rem; font-size: 2.2rem; line-height: 1.3;">ابحث عن عمل وحقق طموحك</h2>
+            <p style="font-size: 1.1rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem;">
+                منصة "فرصة" هي بوابتك السريعة والمباشرة للوصول إلى الشركات والمصانع في مصر. نحن نوفر لك تجربة بحث سهلة، مجانية، وخالية من التعقيدات والوسطاء.
+            </p>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 2.5rem; flex-wrap: wrap;">
+                <span class="badge badge-primary" style="font-size: 1.05rem; padding: 0.6rem 1.2rem;">🔄 تحديثات يومية للوظائف</span>
+                <span class="badge badge-success" style="font-size: 1.05rem; padding: 0.6rem 1.2rem;">📱 تواصل مباشر مع الشركات</span>
+                <span class="badge badge-warning" style="font-size: 1.05rem; padding: 0.6rem 1.2rem;">🎯 فرص لجميع المؤهلات</span>
+            </div>
+
+            <div>
+                <a href="/auth/register" class="btn btn-primary" style="font-size: 1.25rem; padding: 1.2rem 2.5rem; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);">ابدأ رحلتك المهنية الآن 🚀</a>
+            </div>
+        </div>
+        <div style="background: var(--bg-body); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--border);">
+            <h3 style="margin-bottom: 1rem; text-align: center;">إخلاء مسؤولية هام ⚠️</h3>
+            <p style="font-weight: 600; font-size: 0.95rem;">نود التنويه إلى أن الكنيسة لا تتدخل بأي شكل من الأشكال في إجراءات التوظيف، شروط العمل، أو تحديد المرتبات.</p>
+            <p style="font-size: 0.9rem;">دور منصة "فرصة" يقتصر على كونه حلقة وصل مجانية لعرض الوظائف المتاحة في السوق المصري وتسهيل تواصل الباحثين مع الشركات.</p>
+            <p style="font-size: 0.9rem; color: var(--danger); font-weight: 700; text-align: center; margin-top: 1rem;">
+                كافة تفاصيل العمل والتعاقد هي مسؤولية الشركة المعلنة والباحث عن عمل.
+            </p>
+        </div>
+    </div>
+</section>

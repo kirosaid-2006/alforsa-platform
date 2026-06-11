@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: forsa-platform
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_DIALECT
+        value: postgres
+      - key: DATABASE_URL
+        sync: false # User must set this in the Render dashboard manually
+      - key: GEMINI_API_KEY
+        sync: false # User must set this in the Render dashboard manually
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000

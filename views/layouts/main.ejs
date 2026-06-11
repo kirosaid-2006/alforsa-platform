@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' | فرصة' : 'فرصة | منصة التوظيف المصرية المتكاملة' %></title>
+    <meta name="description" content="البحث عن وظائف في مصر للعمال والمحاسبين والفنيين والمهندسين. فرصة هي منصتك الموثوقة.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <%- include('../partials/header') %>
+
+    <main class="page-wrapper">
+        <div class="container">
+            <!-- Global Red Banner for pending surveys -->
+            <% if (locals.user && locals.pendingSurveys && locals.pendingSurveys > 0) { %>
+                <div class="alert-banner">
+                    ⚠️ لديك (<%= pendingSurveys %>) استبيانات معلقة حول نتائج التوظيف. الرجاء 
+                    <a href="/user/my-applications">استكمال الاستبيان</a> 
+                    لمساعدتنا في تحسين المنصة.
+                </div>
+            <% } %>
+
+            <!-- Flash Messages -->
+            <% if (success_messages && success_messages.length > 0) { %>
+                <% success_messages.forEach(function(msg) { %>
+                    <div class="flash-message flash-success"><%= msg %></div>
+                <% }) %>
+            <% } %>
+            
+            <% if (error_messages && error_messages.length > 0) { %>
+                <% error_messages.forEach(function(msg) { %>
+                    <div class="flash-message flash-error"><%= msg %></div>
+                <% }) %>
+            <% } %>
+
+            <% if (warning_messages && warning_messages.length > 0) { %>
+                <% warning_messages.forEach(function(msg) { %>
+                    <div class="flash-message" style="background: var(--warning-bg); border-right: 4px solid var(--warning);"><%= msg %></div>
+                <% }) %>
+            <% } %>
+
+            <!-- Main Content -->
+            <%- body %>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+</body>
+</html>
