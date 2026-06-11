@@ -23,14 +23,14 @@ exports.attachUser = async (req, res, next) => {
                     const pendingSurveysCount = await Application.count({
                         where: {
                             user_id: user.id,
-                            createdAt: { [Op.lte]: fifteenDaysAgo }
+                            createdAt: { [Op.lte]: fifteenDaysAgo },
+                            // Count only if there is no outcome record
+                            '$EmploymentOutcome.id$': null
                         },
                         include: [{
                             model: EmploymentOutcome,
                             required: false
-                        }],
-                        // Count only if there is no outcome record
-                        having: sequelize.literal('"EmploymentOutcome"."id" IS NULL')
+                        }]
                     });
                     
                     res.locals.pendingSurveys = pendingSurveysCount;
