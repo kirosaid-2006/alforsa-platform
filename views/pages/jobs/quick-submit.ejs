@@ -1,0 +1,161 @@
+<div style="max-width: 800px; margin: 2rem auto; padding: 0 1rem;">
+
+    <!-- Success Pop-Up Modal -->
+    <% if (locals.messages && locals.messages.success && messages.success.length > 0) { %>
+        <div id="successModal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 1rem; animation: fadeIn 0.3s ease;">
+            <div style="background: white; border-radius: 24px; max-width: 480px; width: 100%; padding: 2.5rem 2rem; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                
+                <!-- Animated Check Icon -->
+                <div style="width: 80px; height: 80px; background: #ecfdf5; border: 2px solid #a7f3d0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #10b981; font-size: 2.5rem;">
+                    ✓
+                </div>
+
+                <h3 style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0 0 1rem 0;">
+                    تم استلام الوظيفة بنجاح! 🎉
+                </h3>
+
+                <p style="color: #475569; font-size: 1.05rem; line-height: 1.7; margin: 0 0 2rem 0;">
+                    <%= messages.success %>
+                </p>
+
+                <button onclick="document.getElementById('successModal').style.display='none'" 
+                        style="background: #10b981; color: white; border: none; padding: 0.9rem 3rem; border-radius: 14px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                    أوك (موافق) 👍
+                </button>
+            </div>
+        </div>
+
+        <style>
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes scaleUp { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        </style>
+    <% } %>
+
+    <!-- Warning / Clarification Banner -->
+    <div style="background: #fff8e6; border: 1.5px solid #ffe0b2; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+        <div style="font-size: 2rem; line-height: 1;">🏢</div>
+        <div>
+            <h4 style="margin: 0 0 0.5rem 0; color: #b78103; font-size: 1.15rem; font-weight: 800;">
+                استمارة إعلان توظيف — مخصصة لأصحاب الشركات والمصانع والمحلات فقط
+            </h4>
+            <p style="margin: 0; color: #7f5f00; font-size: 0.95rem; line-height: 1.6;">
+                هل تبحث عن عمل؟ هذه الصفحة لنشر الوظائف الخالية من قبل أصحاب الأعمال. إذا كنت باحثاً عن عمل، 
+                <a href="/jobs" style="color: #0d6efd; font-weight: 700; text-decoration: underline;">اضغط هنا لتصفح الوظائف والتقديم</a>.
+            </p>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.8rem; font-weight: 900; color: #0f172a; margin-bottom: 0.5rem;">
+                أعلن عن وظيفة شاغرة مجاناً 🏭
+            </h2>
+            <p style="color: #64748b; font-size: 1.05rem;">
+                انشر إعلانك وسيصل فوراً لآلاف الباحثين عن عمل الموثوقين في محافظتك.
+            </p>
+        </div>
+
+        <% if (locals.messages && locals.messages.error && messages.error.length > 0) { %>
+            <div style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: center; font-weight: 700;">
+                <%= messages.error %>
+            </div>
+        <% } %>
+
+        <form action="/jobs/quick-submit" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Company Name -->
+            <div>
+                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                    اسم الشركة / المصنع / المكان <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="text" name="company_name" required placeholder="مثال: شركة السلام للمواد الغذائية أو مصنع الأمل" 
+                       style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+            </div>
+
+            <!-- Phone & WhatsApp Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                        رقم الهاتف للتواصل <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input type="tel" name="contact_phone" required placeholder="01xxxxxxxxx" 
+                           style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                        رقم الواتساب <span style="color: #64748b; font-weight: 400;">(اختياري)</span>
+                    </label>
+                    <input type="tel" name="contact_whatsapp" placeholder="01xxxxxxxxx" 
+                           style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+                </div>
+            </div>
+
+            <!-- Job Title -->
+            <div>
+                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                    المسمى الوظيفي المطلوب <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="text" name="title" required placeholder="مثال: محاسب، عمال إنتاج، مندوب مبيعات، سائق" 
+                       style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+            </div>
+
+            <!-- Category & Governorate Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                        القسم / التخصص <span style="color: #ef4444;">*</span>
+                    </label>
+                    <select name="category_id" required style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit; background: white;">
+                        <option value="">اختر القسم المناسب</option>
+                        <% if (locals.categories) { %>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.id %>"><%= cat.name %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                        المحافظة <span style="color: #ef4444;">*</span>
+                    </label>
+                    <select name="governorate_id" required style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit; background: white;">
+                        <option value="">اختر المحافظة</option>
+                        <% if (locals.governorates) { %>
+                            <% governorates.forEach(gov => { %>
+                                <option value="<%= gov.id %>"><%= gov.name %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Upload Image Flyer / Logo -->
+            <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 14px; padding: 1.5rem; text-align: center;">
+                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; cursor: pointer;">
+                    🖼️ رفع صورة الإعلان أو البوستر / اللوجو <span style="color: #64748b; font-weight: 400;">(اختياري)</span>
+                </label>
+                <p style="color: #64748b; font-size: 0.85rem; margin: 0 0 1rem 0;">
+                    إذا كان لديك صورة جاهزة للإعلان على واتساب أو فيسبوك، ارفعها هنا مباشرة وسيتم استخدامها.
+                </p>
+                <input type="file" name="job_image" accept="image/*" style="font-size: 0.9rem;">
+            </div>
+
+            <!-- Description & Details -->
+            <div>
+                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
+                    تفاصيل وشروط الوظيفة <span style="color: #64748b; font-weight: 400;">(الراتب، ساعات العمل، المؤهل)</span>
+                </label>
+                <textarea name="description" rows="4" placeholder="اكتب أي تفاصيل أخرى ترغب في توضيحها للباحثين عن عمل..." 
+                          style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit; resize: vertical;"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" style="background: #10b981; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.15rem; font-weight: 800; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem;">
+                أرسل الوظيفة للنشر مجاناً 🚀
+            </button>
+        </form>
+    </div>
+
+</div>

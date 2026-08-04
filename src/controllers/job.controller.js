@@ -257,3 +257,61 @@ exports.report = async (req, res) => {
         res.status(500).json({ success: false, message: 'حدث خطأ أثناء إرسال البلاغ.' });
     }
 };
+
+exports.showQuickSubmit = async (req, res) => {
+    try {
+        const categories = await Category.findAll({ order: [['sort_order', 'ASC']] });
+        const governorates = await Governorate.findAll({ order: [['sort_order', 'ASC']] });
+
+        res.render('pages/jobs/quick-submit', {
+            title: 'أعلن عن وظيفة مجاناً (خاص بالشركات والمصانع)',
+            path: '/jobs/quick-submit',
+            categories,
+            governorates
+        });
+    } catch (error) {
+        console.error('Show Quick Submit Error:', error);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.quickSubmit = async (req, res) => {
+    try {
+        const { company_name, contact_phone, contact_whatsapp, title, category_id, governorate_id, description } = req.body;
+
+        if (!company_name || !contact_phone || !title || !category_id || !governorate_id) {
+            req.flash('error', 'يرجى ملء جميع الحقول الإجبارية الفردية المطلوبة.');
+            return res.redirect('/jobs/quick-submit');
+        }
+
+        const rawSlug = title.trim().toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, '-');
+        const slug = `${rawSlug}-${Date.now()}`;
+
+        const jobDescription = description && description.trim() !== '' 
+            ? description.trim() 
+            : `تطلب شركة/مصنع (${company_name}) شغل وظيفة (${title}). للمزيد والتواصل المباشر مع مسؤول التوظيف عبر الهاتف والواتساب الموضحين.`;
+
+        await Job.create({
+            title: title.trim(),
+            slug,
+            company_name: company_name.trim(),
+            category_id: parseInt(category_id),
+            governorate_id: parseInt(governorate_id),
+            description: jobDescription,
+            contact_phone: contact_phone.trim(),
+            contact_whatsapp: contact_whatsapp ? contact_whatsapp.trim() : contact_phone.trim(),
+            contact_info: `الهاتف: ${contact_phone.trim()}` + (contact_whatsapp ? ` | واتساب: ${contact_whatsapp.trim()}` : ''),
+            image_url: req.file ? `/uploads/jobs/${req.file.filename}` : null,
+            status: 'pending',
+            source: 'web'
+        });
+
+        req.flash('success', 'تم إرسال الوظيفة بنجاح! سيتم مراجعتها من فريق الإدارة ونشرها على الموقع خلال ساعات قادمة.');
+        res.redirect('/jobs/quick-submit');
+    } catch (error) {
+        console.error('Quick Submit Job Error:', error);
+        req.flash('error', 'حدث خطأ أثناء إرسال الوظيفة. يرجى المحاولة مرة أخرى.');
+        res.redirect('/jobs/quick-submit');
+    }
+};
+

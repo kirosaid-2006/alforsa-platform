@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' | فرصة' : 'فرصة | بوابتك للوظائف' %></title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/css/style.css?v=8.0">
+</head>
+<body style="margin: 0; padding: 0;">
+
+    <%- include('../partials/header') %>
+
+    <!-- Global Red Banner for pending surveys -->
+    <% if (locals.user && locals.pendingSurveys && locals.pendingSurveys > 0) { %>
+        <div class="alert-banner" style="background: var(--red-500); color: white; padding: 0.75rem; text-align: center; font-size: 0.85rem; font-family: 'Cairo', sans-serif;">
+            عزيزي <%= locals.user.full_name.split(' ')[0] %>، لديك (<%= pendingSurveys %>) استبيانات معلقة حول نتائج التوظيف. الرجاء 
+            <a href="/user/my-applications" style="color: var(--amber-300); font-weight: bold;">تحديث حالتك</a>.
+        </div>
+    <% } %>
+
+    <!-- Flash Messages -->
+    <% if (locals.success_messages && success_messages.length > 0) { %>
+        <% success_messages.forEach(function(msg) { %>
+            <div style="background: var(--green-500); color: white; padding: 1rem; text-align: center; font-family: 'Cairo', sans-serif;"><%= msg %></div>
+        <% }) %>
+    <% } %>
+    
+    <% if (locals.error_messages && error_messages.length > 0) { %>
+        <% error_messages.forEach(function(msg) { %>
+            <div style="background: var(--red-500); color: white; padding: 1rem; text-align: center; font-family: 'Cairo', sans-serif;"><%= msg %></div>
+        <% }) %>
+    <% } %>
+
+    <!-- Main Content WITHOUT .container wrapper so it can be full width -->
+    <%- body %>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        // Scroll Triggered Reveal (Mobile friendly)
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("saas-fade-up");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0, rootMargin: "50px 0px 0px 0px" });
+
+            document.querySelectorAll(".scroll-reveal, .f-section, .f-steps, .f-stats, .f-cta, .s-card, .f-cat-card, .f-step-card").forEach((el) => {
+                if (!el.classList.contains("scroll-reveal")) el.classList.add("scroll-reveal");
+                el.style.opacity = '0';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -20,21 +20,28 @@ if (process.env.DB_DIALECT === 'sqlite' || !process.env.DB_DIALECT) {
     });
 } else {
     // الاتصال بـ PostgreSQL للإنتاج
-    sequelize = new Sequelize(process.env.DATABASE_URL || {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-        username: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        dialect: 'postgres',
-        logging: false,
-        dialectOptions: process.env.NODE_ENV === 'production' ? {
-            ssl: {
-                require: true,
-                rejectUnauthorized: false
-            }
-        } : {},
-    });
+    if (process.env.DATABASE_URL) {
+        sequelize = new Sequelize(process.env.DATABASE_URL, {
+            dialect: 'postgres',
+            logging: false,
+            dialectOptions: {
+                ssl: {
+                    require: true,
+                    rejectUnauthorized: false
+                }
+            },
+        });
+    } else {
+        sequelize = new Sequelize({
+            host: process.env.DB_HOST,
+            port: process.env.DB_PORT,
+            username: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+            dialect: 'postgres',
+            logging: false,
+        });
+    }
 }
 
 module.exports = sequelize;

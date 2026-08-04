@@ -3,21 +3,26 @@
 /* --- CSS Variables: Clean Light Theme --- */
 :root {
   /* Colors */
-  --bg-body: #f8fafc; /* Slate 50 */
+  --bg-body: #fafaf9; /* Warm Off-white */
   --bg-surface: #ffffff;
-  --text-primary: #0f172a; /* Slate 900 */
-  --text-secondary: #475569; /* Slate 600 */
-  --text-muted: #94a3b8; /* Slate 400 */
+  --text-primary: #0e3a47; /* Deep Teal */
+  --text-secondary: #334155; /* Slate 700 */
+  --text-muted: #64748b; /* Slate 500 */
   
-  /* Primary Brand (Indigo/Blue Gradient) */
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #e0e7ff;
-  --primary-text: #3730a3;
-  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  /* Primary Brand (Deep Teal) */
+  --primary: #0e3a47;
+  --primary-hover: #164e63;
+  --primary-light: #ecfeff;
+  --primary-text: #0891b2;
+  --gradient-primary: linear-gradient(135deg, #0e3a47 0%, #155e75 100%);
   
+  /* Brand Accent (Warm Amber / Orange) */
+  --accent: #ea580c;
+  --accent-hover: #c2410c;
+  --gradient-accent: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+
   /* Secondary Brand */
-  --secondary: #0ea5e9;
+  --secondary: #0284c7;
   
   /* Status Colors */
   --success: #10b981;
@@ -28,10 +33,10 @@
   --danger-bg: #fef2f2;
   
   /* Borders & Shadows */
-  --border: #e2e8f0;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --border: #e7e5e4;
+  --shadow-sm: 0 1px 3px 0 rgba(14, 58, 71, 0.05);
+  --shadow-md: 0 4px 10px -1px rgba(14, 58, 71, 0.08);
+  --shadow-lg: 0 12px 24px -4px rgba(14, 58, 71, 0.12);
   
   /* Layout */
   --radius: 0.75rem;
@@ -130,13 +135,13 @@ p {
 }
 
 .btn-primary {
-  background: var(--gradient-primary);
+  background: var(--gradient-accent);
   color: white !important;
   box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -188,12 +193,11 @@ p {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--primary);
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
   text-decoration: none;
 }
 
@@ -293,7 +297,7 @@ p {
 }
 
 .search-btn {
-  background: var(--gradient-primary);
+  background: var(--gradient-accent);
   color: white;
   border: none;
   padding: 0 2rem;

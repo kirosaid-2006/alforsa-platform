@@ -56,10 +56,15 @@ const startOutcomeSurveyJob = require('./jobs/outcomeSurvey.job');
 const startExpireJobsJob = require('./jobs/expireJobs.job');
 const telegramPullJob = require('./jobs/telegramPull.job');
 
+const runSeeders = require('./seeders');
+
 // Database Sync and Start Server
 sequelize.sync({ force: false })
-    .then(() => {
+    .then(async () => {
         console.log('✅ Database synchronized.');
+        
+        // Auto-run seeders to populate roles, permissions, categories, governorates and settings
+        await runSeeders(false);
         
         // Start background jobs
         startOutcomeSurveyJob();
