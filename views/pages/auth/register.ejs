@@ -1,4 +1,4 @@
-<div style="max-width: 800px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+<div class="register-card">
     <div class="text-center mb-8">
         <h1 style="color: var(--primary);">إنشاء حساب جديد</h1>
         <p>سجل بياناتك مرة واحدة وابدأ في التقديم على آلاف الوظائف المتاحة</p>
@@ -15,8 +15,8 @@
             </div>
             <div class="form-group">
                 <label class="form-label">الرقم القومي (14 رقم) *</label>
-                <input type="text" name="national_id" class="form-control" required minlength="14" maxlength="14" pattern="[0-9٠-٩]{14}" title="يجب إدخال 14 رقم بالضبط" placeholder="xxxxxxxxxxxxxx">
-                <small style="color: var(--text-muted);">لن يتم مشاركة رقمك القومي مع الشركات</small>
+                <input type="text" name="national_id" id="national_id_input" class="form-control" required minlength="14" maxlength="14" pattern="[0-9٠-٩]{14}" title="يجب إدخال 14 رقم بالضبط" placeholder="xxxxxxxxxxxxxx">
+                <small style="color: var(--text-muted);">لن يتم مشاركة رقمك القومي مع الشركات (يُستخدم لتحديد السن تلقائياً)</small>
             </div>
         </div>
 
@@ -49,8 +49,55 @@
 
         <div class="form-row">
             <div class="form-group">
-                <label class="form-label">تاريخ الميلاد *</label>
-                <input type="date" name="birth_date" class="form-control" required>
+                <label class="form-label" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <span>📅 تاريخ الميلاد *</span>
+                    <span id="nid_extracted_badge" style="display: none; font-size: 0.78rem; color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 12px; font-weight: 700;">
+                        ✨ تم تحديده تلقائياً من الرقم القومي
+                    </span>
+                </label>
+                
+                <!-- Hidden input submitted to server -->
+                <input type="hidden" name="birth_date" id="birth_date_hidden" required>
+
+                <!-- 3 Easy Select Dropdowns for Mobile & Desktop -->
+                <div style="display: grid; grid-template-columns: 28% 42% 30%; gap: 0.4rem;">
+                    <!-- Day -->
+                    <select id="birth_day" class="form-control" required style="padding: 0.6rem 0.4rem; text-align: center; cursor: pointer; font-size: 0.92rem; font-family: inherit;">
+                        <option value="">اليوم</option>
+                        <% for (let d = 1; d <= 31; d++) { %>
+                            <option value="<%= d < 10 ? '0' + d : d %>"><%= d %></option>
+                        <% } %>
+                    </select>
+
+                    <!-- Month -->
+                    <select id="birth_month" class="form-control" required style="padding: 0.6rem 0.4rem; cursor: pointer; font-size: 0.92rem; font-family: inherit;">
+                        <option value="">الشهر</option>
+                        <option value="01">1 - يناير</option>
+                        <option value="02">2 - فبراير</option>
+                        <option value="03">3 - مارس</option>
+                        <option value="04">4 - أبريل</option>
+                        <option value="05">5 - مايو</option>
+                        <option value="06">6 - يونيو</option>
+                        <option value="07">7 - يوليو</option>
+                        <option value="08">8 - أغسطس</option>
+                        <option value="09">9 - سبتمبر</option>
+                        <option value="10">10 - أكتوبر</option>
+                        <option value="11">11 - نوفمبر</option>
+                        <option value="12">12 - ديسمبر</option>
+                    </select>
+
+                    <!-- Year -->
+                    <select id="birth_year" class="form-control" required style="padding: 0.6rem 0.4rem; text-align: center; cursor: pointer; font-size: 0.92rem; font-family: inherit;">
+                        <option value="">السنة</option>
+                        <% const currentYear = new Date().getFullYear(); %>
+                        <% for (let y = currentYear - 16; y >= 1945; y--) { %>
+                            <option value="<%= y %>"><%= y %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 0.35rem; font-size: 0.82rem;">
+                    اختر بسهولة أو اكتب الرقم القومي وسيتم تحديده فوراً
+                </small>
             </div>
             <div class="form-group">
                 <label class="form-label">النوع *</label>
@@ -221,3 +268,97 @@
         </div>
     </form>
 </div>
+
+<script>
+// تحويل الأرقام العربية (٠-٩) إلى أرقام إنجليزية (0-9)
+function normalizeArabicDigits(str) {
+    if (!str) return '';
+    return str.replace(/[٠-٩]/g, function(d) {
+        return d.charCodeAt(0) - 1632;
+    });
+}
+
+function updateHiddenBirthDate() {
+    const day = document.getElementById('birth_day').value;
+    const month = document.getElementById('birth_month').value;
+    const year = document.getElementById('birth_year').value;
+    const hiddenInput = document.getElementById('birth_date_hidden');
+
+    if (day && month && year) {
+        hiddenInput.value = `${year}-${month}-${day}`;
+    } else {
+        hiddenInput.value = '';
+    }
+}
+
+['birth_day', 'birth_month', 'birth_year'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('change', updateHiddenBirthDate);
+    }
+});
+
+// استخراج تاريخ الميلاد والنوع تلقائياً من الرقم القومي (14 رقم)
+const nidInput = document.getElementById('national_id_input');
+if (nidInput) {
+    nidInput.addEventListener('input', function() {
+        const rawVal = this.value;
+        const normalized = normalizeArabicDigits(rawVal).replace(/\D/g, '');
+        
+        // الرقم القومي 14 رقم ويبدأ بـ 2 (مواليد 1900-1999) أو 3 (مواليد 2000-2099)
+        if (normalized.length === 14 && /^[23]\d{13}$/.test(normalized)) {
+            const centuryDigit = parseInt(normalized.charAt(0));
+            const yearPart = normalized.substring(1, 3);
+            const monthPart = normalized.substring(3, 5);
+            const dayPart = normalized.substring(5, 7);
+            const genderDigit = parseInt(normalized.charAt(12));
+
+            const fullYear = (centuryDigit === 2 ? '19' : '20') + yearPart;
+
+            const daySelect = document.getElementById('birth_day');
+            const monthSelect = document.getElementById('birth_month');
+            const yearSelect = document.getElementById('birth_year');
+
+            if (daySelect && monthSelect && yearSelect) {
+                daySelect.value = dayPart;
+                monthSelect.value = monthPart;
+                yearSelect.value = fullYear;
+                updateHiddenBirthDate();
+
+                const badge = document.getElementById('nid_extracted_badge');
+                if (badge) badge.style.display = 'inline-block';
+            }
+
+            // تحديد النوع: فردي = ذكر، زوجي = أنثى
+            if (genderDigit % 2 === 1) {
+                const maleRadio = document.getElementById('gender_m');
+                if (maleRadio) maleRadio.checked = true;
+            } else {
+                const femaleRadio = document.getElementById('gender_f');
+                if (femaleRadio) femaleRadio.checked = true;
+            }
+        }
+    });
+}
+</script>
+
+<style>
+.register-card {
+    max-width: 800px;
+    margin: 1.5rem auto 3rem;
+    background: white;
+    padding: 2.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 639px) {
+    .register-card {
+        padding: 1.25rem 1rem;
+        margin: 1rem auto 2rem;
+        border-radius: 16px;
+    }
+}
+</style>
+
