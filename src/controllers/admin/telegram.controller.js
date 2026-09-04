@@ -84,19 +84,28 @@ exports.testPull = async (req, res) => {
             return res.redirect('/admin/telegram');
         }
 
-        const results = await telegramPullJob.triggerManualPull(channel.channel_username);
+        const force = req.query.force === 'true';
+        const results = await telegramPullJob.triggerManualPull(channel.channel_username, force);
         
         if (results && results.length > 0) {
             const r = results[0];
             if (r.error) {
                 req.flash('error', `خطأ أثناء السحب: ${r.error}`);
             } else {
-                let msg = `قناة (${channel.channel_name}): تم فحص ${r.fetched} رسالة، `;
-                msg += `وإضافة ${r.added} وظيفة جديدة بنجاح للمراجعة! `;
-                if (r.duplicates > 0) msg += `(تم تخطي ${r.duplicates} وظيفة مكررة مسجلة مسبقاً).`;
+                let msg = `قناة (${channel.channel_name}): تم فحص ${r.fetched} رسالة وبوستر، `;
+                msg += `وتمت إضافة ${r.added} وظيفة جديدة بنجاح لقائمة المراجعة! `;
+                
+                if (r.duplicates > 0) {
+                    msg += `(تم تخطي ${r.duplicates} لأنها مسجلة مسبقاً في قاعدة البيانات). `;
+                }
+                if (r.errors && r.errors.length > 0) {
+                    msg += `[تفاصيل أخطاء المعالجة: ${r.errors.join(' | ')}] `;
+                }
                 
                 if (r.added > 0) {
-                    req.flash('success', `🎉 ${msg}`);
+                    req.flash('success', `🎉 ${msg} تفقد صفحة "الوظائف المعلقة" لمراجعتها واعتمادها.`);
+                } else if (r.duplicates > 0) {
+                    req.flash('warning', `ℹ️ ${msg} يمكنك الضغط على "سحب إجباري" إذا أردت تكرار إدخالها.`);
                 } else {
                     req.flash('warning', `ℹ️ ${msg}`);
                 }
@@ -115,7 +124,8 @@ exports.testPull = async (req, res) => {
 
 exports.pullAll = async (req, res) => {
     try {
-        const results = await telegramPullJob.triggerManualPull();
+        const force = req.query.force === 'true';
+        const results = await telegramPullJob.triggerManualPull(null, force);
         let totalFetched = 0;
         let totalAdded = 0;
         let totalDuplicates = 0;
@@ -127,9 +137,9 @@ exports.pullAll = async (req, res) => {
         });
 
         if (totalAdded > 0) {
-            req.flash('success', `🎉 اكتمل السحب الشامل: تم فحص ${totalFetched} رسالة، وإضافة ${totalAdded} وظيفة جديدة للمراجعة بنجاح (${totalDuplicates} مكررة).`);
+            req.flash('success', `🎉 اكتمل السحب الشامل: تم فحص ${totalFetched} رسالة، وإضافة ${totalAdded} وظيفة جديدة للمراجعة بنجاح (${totalDuplicates} مسجلة مسبقاً). تفقد صفحة الوظائف المعلقة.`);
         } else {
-            req.flash('warning', `ℹ️ اكتمل السحب الشامل: تم فحص ${totalFetched} رسالة، ولم توجد وظائف جديدة (${totalDuplicates} وظيفة مسجلة مسبقاً).`);
+            req.flash('warning', `ℹ️ اكتمل السحب الشامل: تم فحص ${totalFetched} رسالة، وجميعها (${totalDuplicates}) مسجلة ومحفوظة مسبقاً في قاعدة البيانات.`);
         }
         res.redirect('/admin/telegram');
     } catch (error) {
