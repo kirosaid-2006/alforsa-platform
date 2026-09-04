@@ -41,6 +41,7 @@ router.post('/users/:id/toggle-ban', hasPermission('users.manage'), usersControl
 
 // Telegram Channels Management
 router.get('/telegram', hasPermission('telegram.manage'), telegramController.index);
+router.post('/telegram/save-key', hasPermission('telegram.manage'), telegramController.saveApiKey);
 router.post('/telegram', hasPermission('telegram.manage'), telegramController.store);
 router.post('/telegram/pull-all', hasPermission('telegram.manage'), telegramController.pullAll);
 router.post('/telegram/:id/toggle', hasPermission('telegram.manage'), telegramController.toggleActive);
