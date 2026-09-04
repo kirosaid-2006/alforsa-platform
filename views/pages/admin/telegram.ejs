@@ -7,18 +7,18 @@
         <div>
             <h2 style="margin: 0;">إدارة قنوات تليجرام وبوت السحب الآلي 🤖</h2>
             <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.95rem;">
-                يتم سحب الوظائف تلقائياً كل ساعتين، ويمكنك أيضاً بدء السحب اليدوي في أي وقت.
+                يتم سحب أحدث إعلانات وبوسترات الوظائف تلقائياً وإضافتها للمراجعة في صفحة الوظائف المعلقة.
             </p>
         </div>
 
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-            <a href="/admin/jobs/pending" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary);">
-                📋 مراجعة الوظائف المعلقة
+            <a href="/admin/jobs/pending" class="btn btn-primary" style="background: #0284c7; color: white !important;">
+                📋 استعراض الوظائف المعلقة
             </a>
             <% if (locals.channels && channels.some(c => c.is_active)) { %>
                 <form action="/admin/telegram/pull-all" method="POST" style="margin: 0;">
                     <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                        ⚡ سحب جميع القنوات الآن
+                        ⚡ سحب جميع القنوات
                     </button>
                 </form>
             <% } %>
@@ -48,8 +48,8 @@
             </form>
             
             <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-body); border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
-                <strong>💡 كيف يعمل النظام؟</strong><br>
-                النظام يقوم بقراءة أحدث الرسائل والصور من القنوات العامة وتحليلها تلقائياً بالذكاء الاصطناعي (أو المحلل المصري الذكي)، ثم حفظها في صفحة <a href="/admin/jobs/pending" style="font-weight: 700; text-decoration: underline;">الوظائف المعلقة</a> لاعتمادها ونشرها بنقرة واحدة!
+                <strong>💡 أين تذهب الوظائف المسحوبة؟</strong><br>
+                جميع الوظائف والبوسترات المسحوبة تُحفظ مباشرة في صفحة <a href="/admin/jobs/pending" style="font-weight: 700; color: #0284c7; text-decoration: underline;">الوظائف المعلقة (/admin/jobs/pending)</a> لتتمكن من فحصها واعتمادها لتظهر للجمهور!
             </div>
         </div>
 
@@ -79,9 +79,9 @@
                                     </a>
                                 </td>
                                 <td style="padding: 1rem; text-align: center;">
-                                    <span class="badge badge-primary" style="font-size: 0.9rem; padding: 0.35rem 0.75rem;">
-                                        <%= ch.jobs_created || 0 %>
-                                    </span>
+                                    <a href="/admin/jobs/pending" class="badge badge-primary" style="font-size: 0.9rem; padding: 0.35rem 0.75rem; text-decoration: none;" title="اضغط لعرض الوظائف في قائمة المراجعة">
+                                        <%= ch.jobs_created || 0 %> وظيفة
+                                    </a>
                                 </td>
                                 <td style="padding: 1rem; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
                                     <%= ch.last_scraped_at ? new Date(ch.last_scraped_at).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' }) : 'لم يتم السحب بعد' %>
@@ -96,19 +96,22 @@
                                 <td style="padding: 1rem; text-align: center;">
                                     <div style="display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap;">
                                         <% if (ch.is_active) { %>
-                                            <a href="/admin/telegram/<%= ch.id %>/test-pull" class="btn btn-outline" style="padding: 0.3rem 0.7rem; font-size: 0.85rem; border-color: #10b981; color: #059669;" title="سحب الرسائل الجديدة فوراً">
+                                            <a href="/admin/telegram/<%= ch.id %>/test-pull" class="btn btn-outline" style="padding: 0.3rem 0.65rem; font-size: 0.82rem; border-color: #10b981; color: #059669;" title="سحب الرسائل والبوسترات الجديدة">
                                                 سحب الآن 🔄
+                                            </a>
+                                            <a href="/admin/telegram/<%= ch.id %>/test-pull?force=true" class="btn btn-outline" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-color: #f59e0b; color: #d97706;" title="سحب إجباري حتى لو كانت مسجلة مسبقاً">
+                                                إجباري ⚡
                                             </a>
                                         <% } %>
 
                                         <form action="/admin/telegram/<%= ch.id %>/toggle" method="POST" style="margin: 0;">
-                                            <button type="submit" class="btn <%= ch.is_active ? 'btn-danger' : 'btn-success' %>" style="padding: 0.3rem 0.7rem; font-size: 0.85rem;">
+                                            <button type="submit" class="btn <%= ch.is_active ? 'btn-danger' : 'btn-success' %>" style="padding: 0.3rem 0.7rem; font-size: 0.82rem;">
                                                 <%= ch.is_active ? 'إيقاف' : 'تفعيل' %>
                                             </button>
                                         </form>
 
                                         <form action="/admin/telegram/<%= ch.id %>/delete" method="POST" style="margin: 0;" onsubmit="return confirm('هل أنت متأكد من حذف هذه القناة نهائياً؟')">
-                                            <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.85rem; color: #ef4444; border-color: #fecaca;" title="حذف القناة">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.5rem; font-size: 0.82rem; color: #ef4444; border-color: #fecaca;" title="حذف القناة">
                                                 🗑️
                                             </button>
                                         </form>
