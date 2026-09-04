@@ -1,4 +1,4 @@
-const { TelegramChannel, User } = require('../../models');
+const { TelegramChannel, User, Setting } = require('../../models');
 const telegramPullJob = require('../../jobs/telegramPull.job');
 
 exports.index = async (req, res) => {
@@ -7,14 +7,36 @@ exports.index = async (req, res) => {
             order: [['createdAt', 'DESC']]
         });
         
+        const geminiSetting = await Setting.findOne({ where: { key: 'gemini_api_key' } });
+        const geminiApiKey = geminiSetting ? geminiSetting.value : (process.env.GEMINI_API_KEY || '');
+
         res.render('pages/admin/telegram', {
             title: 'إدارة قنوات تليجرام',
             path: '/admin/telegram',
-            channels
+            channels,
+            geminiApiKey
         });
     } catch (error) {
         console.error('Telegram Channels Error:', error);
         res.status(500).send('Server Error');
+    }
+};
+
+exports.saveApiKey = async (req, res) => {
+    try {
+        const { gemini_api_key } = req.body;
+        const [setting] = await Setting.findOrCreate({
+            where: { key: 'gemini_api_key' },
+            defaults: { key: 'gemini_api_key', value: (gemini_api_key || '').trim(), description: 'Google Gemini API Key' }
+        });
+        setting.value = (gemini_api_key || '').trim();
+        await setting.save();
+        req.flash('success', 'تم حفظ وتحديث مفتاح Google Gemini بنجاح.');
+        res.redirect('/admin/telegram');
+    } catch (error) {
+        console.error('Save API Key Error:', error);
+        req.flash('error', 'حدث خطأ أثناء حفظ المفتاح.');
+        res.redirect('/admin/telegram');
     }
 };
 
