@@ -3,87 +3,142 @@
 
 <!-- Main Content -->
 <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h2 style="margin: 0;">إدارة قنوات تليجرام 🤖</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h2 style="margin: 0;">إدارة قنوات تليجرام وبوت السحب الآلي 🤖</h2>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.95rem;">
+                يتم سحب الوظائف تلقائياً كل ساعتين، ويمكنك أيضاً بدء السحب اليدوي في أي وقت.
+            </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
-            
-            <!-- Add Form -->
-            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; height: fit-content; box-shadow: var(--shadow-sm);">
-                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.25rem;">إضافة قناة جديدة</h3>
-                <form action="/admin/telegram" method="POST">
-                    <div class="form-group">
-                        <label class="form-label">اسم القناة (للعرض)</label>
-                        <input type="text" name="channel_name" class="form-control" required placeholder="مثال: وظائف مصانع العبور">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">رابط أو معرف القناة (Username)</label>
-                        <input type="text" name="channel_username" class="form-control" required placeholder="مثال: @jobs_egypt">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">معرف القناة الداخلي (ID) - اختياري</label>
-                        <input type="text" name="channel_id" class="form-control" placeholder="مثال: -1001234567890">
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">إضافة القناة</button>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="/admin/jobs/pending" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary);">
+                📋 مراجعة الوظائف المعلقة
+            </a>
+            <% if (locals.channels && channels.some(c => c.is_active)) { %>
+                <form action="/admin/telegram/pull-all" method="POST" style="margin: 0;">
+                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        ⚡ سحب جميع القنوات الآن
+                    </button>
                 </form>
-                
-                <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-body); border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--text-secondary);">
-                    <strong>💡 معلومة:</strong> سيقوم الذكاء الاصطناعي (Grok) آلياً بقراءة الوظائف من هذه القنوات، تحليلها، واستخراج بياناتها (المسمى، الراتب، المكان) ليتم مراجعتها من قبلك.
-                </div>
-            </div>
-
-            <!-- Channels List -->
-            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);">
-                <table style="width: 100%; text-align: right; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border);">
-                            <th style="padding: 1rem;">اسم القناة</th>
-                            <th style="padding: 1rem;">المعرف</th>
-                            <th style="padding: 1rem; text-align: center;">عدد الوظائف المسحوبة</th>
-                            <th style="padding: 1rem; text-align: center;">الحالة</th>
-                            <th style="padding: 1rem; text-align: center;">إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (locals.channels && channels.length > 0) { %>
-                            <% channels.forEach(ch => { %>
-                                <tr style="border-bottom: 1px solid var(--border);">
-                                    <td style="padding: 1rem; font-weight: 600;"><%= ch.channel_name %></td>
-                                    <td style="padding: 1rem;" dir="ltr"><%= ch.channel_username %></td>
-                                    <td style="padding: 1rem; text-align: center;">
-                                        <span class="badge badge-primary"><%= ch.jobs_created || 0 %></span>
-                                    </td>
-                                    <td style="padding: 1rem; text-align: center;">
-                                        <% if (ch.is_active) { %>
-                                            <span class="badge badge-success">تعمل</span>
-                                        <% } else { %>
-                                            <span class="badge badge-danger">متوقفة</span>
-                                        <% } %>
-                                    </td>
-                                    <td style="padding: 1rem; text-align: center;">
-                                        <div style="display: flex; gap: 0.5rem; justify-content: center;">
-                                            <form action="/admin/telegram/<%= ch.id %>/toggle" method="POST" style="margin: 0;">
-                                                <button type="submit" class="btn <%= ch.is_active ? 'btn-danger' : 'btn-success' %>" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">
-                                                    <%= ch.is_active ? 'إيقاف' : 'تفعيل' %>
-                                                </button>
-                                            </form>
-                                            <% if (ch.is_active) { %>
-                                                <a href="/admin/telegram/<%= ch.id %>/test-pull" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border-color: var(--primary); color: var(--primary);">
-                                                    سحب الآن 🔄
-                                                </a>
-                                            <% } %>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                        <% } else { %>
-                            <tr><td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-secondary);">لا توجد قنوات تليجرام مسجلة حتى الآن.</td></tr>
-                        <% } %>
-                    </tbody>
-                </table>
-            </div>
-
+            <% } %>
         </div>
     </div>
 
+    <div class="telegram-admin-grid">
+        
+        <!-- Add Form -->
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; height: fit-content; box-shadow: var(--shadow-sm);">
+            <h3 style="margin-top: 0; margin-bottom: 1.25rem; font-size: 1.2rem;">إضافة قناة جديدة 📡</h3>
+            <form action="/admin/telegram" method="POST">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label">اسم القناة (للعرض)</label>
+                    <input type="text" name="channel_name" class="form-control" required placeholder="مثال: وظائف العاشر من رمضان">
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label">معرف أو رابط القناة (Username)</label>
+                    <input type="text" name="channel_username" class="form-control" required placeholder="مثال: @jobs_egypt أو t.me/jobs_egypt">
+                    <small style="color: var(--text-muted); font-size: 0.8rem;">يمكنك لصق رابط القناة أو اليوزر نيم مباشرة</small>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label class="form-label">معرف القناة الداخلي (ID) - اختياري</label>
+                    <input type="text" name="channel_id" class="form-control" placeholder="مثال: -1001234567890">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">حفظ وإضافة القناة ➕</button>
+            </form>
+            
+            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-body); border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong>💡 كيف يعمل النظام؟</strong><br>
+                النظام يقوم بقراءة أحدث الرسائل والصور من القنوات العامة وتحليلها تلقائياً بالذكاء الاصطناعي (أو المحلل المصري الذكي)، ثم حفظها في صفحة <a href="/admin/jobs/pending" style="font-weight: 700; text-decoration: underline;">الوظائف المعلقة</a> لاعتمادها ونشرها بنقرة واحدة!
+            </div>
+        </div>
+
+        <!-- Channels List -->
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow-sm);">
+            <table style="width: 100%; text-align: right; border-collapse: collapse; min-width: 600px;">
+                <thead>
+                    <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border);">
+                        <th style="padding: 1rem;">القناة</th>
+                        <th style="padding: 1rem;">المعرف</th>
+                        <th style="padding: 1rem; text-align: center;">الوظائف المضافة</th>
+                        <th style="padding: 1rem; text-align: center;">آخر سحب</th>
+                        <th style="padding: 1rem; text-align: center;">الحالة</th>
+                        <th style="padding: 1rem; text-align: center;">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (locals.channels && channels.length > 0) { %>
+                        <% channels.forEach(ch => { %>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 1rem; font-weight: 700;">
+                                    <%= ch.channel_name %>
+                                </td>
+                                <td style="padding: 1rem;" dir="ltr">
+                                    <a href="https://t.me/<%= ch.channel_username.replace('@', '') %>" target="_blank" style="color: #0284c7; font-weight: 600;">
+                                        <%= ch.channel_username %> ↗
+                                    </a>
+                                </td>
+                                <td style="padding: 1rem; text-align: center;">
+                                    <span class="badge badge-primary" style="font-size: 0.9rem; padding: 0.35rem 0.75rem;">
+                                        <%= ch.jobs_created || 0 %>
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+                                    <%= ch.last_scraped_at ? new Date(ch.last_scraped_at).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' }) : 'لم يتم السحب بعد' %>
+                                </td>
+                                <td style="padding: 1rem; text-align: center;">
+                                    <% if (ch.is_active) { %>
+                                        <span class="badge badge-success">نشطة</span>
+                                    <% } else { %>
+                                        <span class="badge badge-danger">متوقفة</span>
+                                    <% } %>
+                                </td>
+                                <td style="padding: 1rem; text-align: center;">
+                                    <div style="display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap;">
+                                        <% if (ch.is_active) { %>
+                                            <a href="/admin/telegram/<%= ch.id %>/test-pull" class="btn btn-outline" style="padding: 0.3rem 0.7rem; font-size: 0.85rem; border-color: #10b981; color: #059669;" title="سحب الرسائل الجديدة فوراً">
+                                                سحب الآن 🔄
+                                            </a>
+                                        <% } %>
+
+                                        <form action="/admin/telegram/<%= ch.id %>/toggle" method="POST" style="margin: 0;">
+                                            <button type="submit" class="btn <%= ch.is_active ? 'btn-danger' : 'btn-success' %>" style="padding: 0.3rem 0.7rem; font-size: 0.85rem;">
+                                                <%= ch.is_active ? 'إيقاف' : 'تفعيل' %>
+                                            </button>
+                                        </form>
+
+                                        <form action="/admin/telegram/<%= ch.id %>/delete" method="POST" style="margin: 0;" onsubmit="return confirm('هل أنت متأكد من حذف هذه القناة نهائياً؟')">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.85rem; color: #ef4444; border-color: #fecaca;" title="حذف القناة">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="6" style="padding: 2.5rem; text-align: center; color: var(--text-secondary);">
+                                لا توجد قنوات تليجرام مسجلة حتى الآن. أضف قناتك الأولى من النموذج الجانبي!
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.telegram-admin-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1.5rem;
+}
+@media (max-width: 900px) {
+    .telegram-admin-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
