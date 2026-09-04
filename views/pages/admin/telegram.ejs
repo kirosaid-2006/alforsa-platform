@@ -27,9 +27,30 @@
 
     <div class="telegram-admin-grid">
         
-        <!-- Add Form -->
-        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; height: fit-content; box-shadow: var(--shadow-sm);">
-            <h3 style="margin-top: 0; margin-bottom: 1.25rem; font-size: 1.2rem;">إضافة قناة جديدة 📡</h3>
+        <!-- Left Column: Settings and Add Channel -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Gemini AI Key Configuration -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); border-top: 4px solid #6366f1;">
+                <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.15rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🧠</span> مفتاح الذكاء الاصطناعي (Gemini AI)
+                </h3>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">
+                    يستخدم لفحص صور وبوسترات الوظائف واستخراج النصوص والشروط وتحديد الفئة تلقائياً بدون حفظ الصورة.
+                </p>
+                <form action="/admin/telegram/save-key" method="POST">
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label" style="font-size: 0.85rem;">Gemini API Key</label>
+                        <input type="password" name="gemini_api_key" class="form-control" value="<%= locals.geminiApiKey || '' %>" placeholder="AIzaSy..." style="font-family: monospace; font-size: 0.9rem;" autocomplete="off">
+                        <small style="color: var(--text-muted); font-size: 0.78rem;">يمكنك الحصول عليه مجاناً من Google AI Studio</small>
+                    </div>
+                    <button type="submit" class="btn btn-outline" style="width: 100%; border-color: #6366f1; color: #4f46e5; font-weight: 600; padding: 0.5rem;">حفظ المفتاح 💾</button>
+                </form>
+            </div>
+            
+            <!-- Add Form -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; height: fit-content; box-shadow: var(--shadow-sm);">
+                <h3 style="margin-top: 0; margin-bottom: 1.25rem; font-size: 1.2rem;">إضافة قناة جديدة 📡</h3>
             <form action="/admin/telegram" method="POST">
                 <div class="form-group" style="margin-bottom: 1rem;">
                     <label class="form-label">اسم القناة (للعرض)</label>
@@ -52,6 +73,7 @@
                 جميع الوظائف والبوسترات المسحوبة تُحفظ مباشرة في صفحة <a href="/admin/jobs/pending" style="font-weight: 700; color: #0284c7; text-decoration: underline;">الوظائف المعلقة (/admin/jobs/pending)</a> لتتمكن من فحصها واعتمادها لتظهر للجمهور!
             </div>
         </div>
+    </div>
 
         <!-- Channels List -->
         <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow-x: auto; box-shadow: var(--shadow-sm);">
