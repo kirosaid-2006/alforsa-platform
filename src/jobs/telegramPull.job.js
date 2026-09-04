@@ -253,12 +253,15 @@ async function pullJobsFromTelegram(specificChannelUsername = null) {
                     const jobSlug = `${safeSlug}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
                     // --- 7. Save Job as 'pending' for Admin Review ---
+                    // Note: image_url is intentionally set to null as per user requirement (extract text only, do not attach the image)
+                    const jobDescription = (extractedData.description || text || 'تفاصيل وشروط الوظيفة موضحة أعلاه.').trim();
+
                     const createdJob = await Job.create({
                         title: rawTitle,
                         slug: jobSlug,
-                        description: extractedData.description || text || 'تفاصيل وشروط الوظيفة موضحة بالكامل في صورة الإعلان والبوستر المرفق أعلاه.',
+                        description: jobDescription,
                         requirements: extractedData.requirements || null,
-                        company_name: extractedData.company_name || 'شركة معلنة في البوستر',
+                        company_name: extractedData.company_name || 'شركة معلنة',
                         category_id,
                         governorate_id,
                         city: extractedData.city || null,
@@ -269,7 +272,7 @@ async function pullJobsFromTelegram(specificChannelUsername = null) {
                         contact_phone: extractedData.contact_phone || null,
                         contact_whatsapp: extractedData.contact_whatsapp || extractedData.contact_phone || null,
                         contact_info: extractedData.contact_phone ? `الهاتف: ${extractedData.contact_phone}` : null,
-                        image_url: extractedData.image_url || null,
+                        image_url: null, // do not attach image itself
                         telegram_message_id: extractedData.telegram_message_id || null,
                         telegram_message_url: extractedData.telegram_message_url || null,
                         telegram_raw_text: extractedData.telegram_raw_text,
