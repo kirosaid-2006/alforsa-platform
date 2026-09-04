@@ -1,161 +1,646 @@
-<div style="max-width: 800px; margin: 2rem auto; padding: 0 1rem;">
+<div class="qs-page-wrapper">
 
     <!-- Success Pop-Up Modal -->
     <% if (locals.messages && locals.messages.success && messages.success.length > 0) { %>
-        <div id="successModal" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 1rem; animation: fadeIn 0.3s ease;">
-            <div style="background: white; border-radius: 24px; max-width: 480px; width: 100%; padding: 2.5rem 2rem; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-                
+        <div id="successModal" class="qs-modal-overlay">
+            <div class="qs-modal-content">
                 <!-- Animated Check Icon -->
-                <div style="width: 80px; height: 80px; background: #ecfdf5; border: 2px solid #a7f3d0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #10b981; font-size: 2.5rem;">
-                    ✓
+                <div class="qs-modal-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
                 </div>
 
-                <h3 style="font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0 0 1rem 0;">
+                <h3 class="qs-modal-title">
                     تم استلام الوظيفة بنجاح! 🎉
                 </h3>
 
-                <p style="color: #475569; font-size: 1.05rem; line-height: 1.7; margin: 0 0 2rem 0;">
+                <p class="qs-modal-desc">
                     <%= messages.success %>
                 </p>
 
-                <button onclick="document.getElementById('successModal').style.display='none'" 
-                        style="background: #10b981; color: white; border: none; padding: 0.9rem 3rem; border-radius: 14px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <button type="button" onclick="document.getElementById('successModal').style.display='none'" class="qs-modal-btn">
                     أوك (موافق) 👍
                 </button>
             </div>
         </div>
-
-        <style>
-            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-            @keyframes scaleUp { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        </style>
     <% } %>
 
-    <!-- Warning / Clarification Banner -->
-    <div style="background: #fff8e6; border: 1.5px solid #ffe0b2; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
-        <div style="font-size: 2rem; line-height: 1;">🏢</div>
-        <div>
-            <h4 style="margin: 0 0 0.5rem 0; color: #b78103; font-size: 1.15rem; font-weight: 800;">
-                استمارة إعلان توظيف — مخصصة لأصحاب الشركات والمصانع والمحلات فقط
-            </h4>
-            <p style="margin: 0; color: #7f5f00; font-size: 0.95rem; line-height: 1.6;">
-                هل تبحث عن عمل؟ هذه الصفحة لنشر الوظائف الخالية من قبل أصحاب الأعمال. إذا كنت باحثاً عن عمل، 
-                <a href="/jobs" style="color: #0d6efd; font-weight: 700; text-decoration: underline;">اضغط هنا لتصفح الوظائف والتقديم</a>.
+    <!-- Notice / Clarification Banner -->
+    <div class="qs-notice-banner">
+        <div class="qs-notice-icon">🏢</div>
+        <div class="qs-notice-body">
+            <h4>استمارة إعلان توظيف — مخصصة للشركات والمصانع وأصحاب الأعمال</h4>
+            <p>
+                هل تبحث عن عمل؟ هذه الصفحة مخصصة فقط لنشر وإعلان الوظائف الشاغرة. إذا كنت باحثاً عن وظيفة، 
+                <a href="/jobs">اضغط هنا لتصفح الوظائف والتقديم مجاناً</a>.
             </p>
         </div>
     </div>
 
     <!-- Form Container -->
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h2 style="font-size: 1.8rem; font-weight: 900; color: #0f172a; margin-bottom: 0.5rem;">
-                أعلن عن وظيفة شاغرة مجاناً 🏭
-            </h2>
-            <p style="color: #64748b; font-size: 1.05rem;">
-                انشر إعلانك وسيصل فوراً لآلاف الباحثين عن عمل الموثوقين في محافظتك.
-            </p>
+    <div class="qs-card">
+        <div class="qs-header">
+            <div class="qs-badge">خدمة مجانية 100% ✨</div>
+            <h2>أعلن عن وظيفة شاغرة 🏭</h2>
+            <p>انشر إعلانك الآن وسيصل فوراً لآلاف الباحثين عن عمل والكوادر المؤهلة في محافظتك.</p>
         </div>
 
         <% if (locals.messages && locals.messages.error && messages.error.length > 0) { %>
-            <div style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: center; font-weight: 700;">
-                <%= messages.error %>
+            <div class="qs-error-banner">
+                ⚠️ <%= messages.error %>
             </div>
         <% } %>
 
-        <form action="/jobs/quick-submit" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <form action="/jobs/quick-submit" method="POST" enctype="multipart/form-data" id="quickSubmitForm">
             
             <!-- Company Name -->
-            <div>
-                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                    اسم الشركة / المصنع / المكان <span style="color: #ef4444;">*</span>
+            <div class="qs-field">
+                <label class="qs-label">
+                    <span>🏢 اسم الشركة / المصنع / جهة العمل</span>
+                    <span class="qs-required">*</span>
                 </label>
-                <input type="text" name="company_name" required placeholder="مثال: شركة السلام للمواد الغذائية أو مصنع الأمل" 
-                       style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+                <input type="text" name="company_name" required 
+                       placeholder="مثال: شركة السلام للمواد الغذائية، مصنع الأمل، سوبر ماركت الهدى..." 
+                       class="qs-input">
             </div>
 
             <!-- Phone & WhatsApp Grid -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div>
-                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                        رقم الهاتف للتواصل <span style="color: #ef4444;">*</span>
+            <div class="qs-grid-2">
+                <div class="qs-field">
+                    <label class="qs-label">
+                        <span>📱 رقم الهاتف للتواصل والاتصال</span>
+                        <span class="qs-required">*</span>
                     </label>
-                    <input type="tel" name="contact_phone" required placeholder="01xxxxxxxxx" 
-                           style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+                    <input type="tel" name="contact_phone" required 
+                           placeholder="01xxxxxxxxx" 
+                           pattern="[0-9٠-٩]{10,12}"
+                           class="qs-input" dir="ltr" style="text-align: right;">
+                    <span class="qs-hint">الرقم الذي سيتصل عليه المتقدمون مباشرة</span>
                 </div>
-                <div>
-                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                        رقم الواتساب <span style="color: #64748b; font-weight: 400;">(اختياري)</span>
+                <div class="qs-field">
+                    <label class="qs-label">
+                        <span>💬 رقم الواتساب</span>
+                        <span class="qs-optional">(اختياري)</span>
                     </label>
-                    <input type="tel" name="contact_whatsapp" placeholder="01xxxxxxxxx" 
-                           style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+                    <input type="tel" name="contact_whatsapp" 
+                           placeholder="01xxxxxxxxx" 
+                           class="qs-input" dir="ltr" style="text-align: right;">
+                    <span class="qs-hint">إن كان مختلفاً عن رقم الهاتف</span>
                 </div>
             </div>
 
             <!-- Job Title -->
-            <div>
-                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                    المسمى الوظيفي المطلوب <span style="color: #ef4444;">*</span>
+            <div class="qs-field">
+                <label class="qs-label">
+                    <span>💼 المسمى الوظيفي المطلوب</span>
+                    <span class="qs-required">*</span>
                 </label>
-                <input type="text" name="title" required placeholder="مثال: محاسب، عمال إنتاج، مندوب مبيعات، سائق" 
-                       style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit;">
+                <input type="text" name="title" required 
+                       placeholder="مثال: محاسب، فني كهرباء، عمال إنتاج وتعبئة، سائق، كاشير..." 
+                       class="qs-input">
             </div>
 
             <!-- Category & Governorate Grid -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div>
-                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                        القسم / التخصص <span style="color: #ef4444;">*</span>
+            <div class="qs-grid-2">
+                <div class="qs-field">
+                    <label class="qs-label">
+                        <span>🏷️ القسم / التخصص</span>
+                        <span class="qs-required">*</span>
                     </label>
-                    <select name="category_id" required style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit; background: white;">
-                        <option value="">اختر القسم المناسب</option>
-                        <% if (locals.categories) { %>
-                            <% categories.forEach(cat => { %>
-                                <option value="<%= cat.id %>"><%= cat.name %></option>
-                            <% }) %>
-                        <% } %>
-                    </select>
+                    <div class="qs-select-wrapper">
+                        <select name="category_id" required class="qs-select">
+                            <option value="">اختر القسم المناسب للوظيفة...</option>
+                            <% if (locals.categories) { %>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
                 </div>
 
-                <div>
-                    <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                        المحافظة <span style="color: #ef4444;">*</span>
+                <div class="qs-field">
+                    <label class="qs-label">
+                        <span>📍 المحافظة</span>
+                        <span class="qs-required">*</span>
                     </label>
-                    <select name="governorate_id" required style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit; background: white;">
-                        <option value="">اختر المحافظة</option>
-                        <% if (locals.governorates) { %>
-                            <% governorates.forEach(gov => { %>
-                                <option value="<%= gov.id %>"><%= gov.name %></option>
-                            <% }) %>
-                        <% } %>
-                    </select>
+                    <div class="qs-select-wrapper">
+                        <select name="governorate_id" required class="qs-select">
+                            <option value="">اختر المحافظة...</option>
+                            <% if (locals.governorates) { %>
+                                <% governorates.forEach(gov => { %>
+                                    <option value="<%= gov.id %>"><%= gov.name %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <!-- Upload Image Flyer / Logo -->
-            <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 14px; padding: 1.5rem; text-align: center;">
-                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; cursor: pointer;">
-                    🖼️ رفع صورة الإعلان أو البوستر / اللوجو <span style="color: #64748b; font-weight: 400;">(اختياري)</span>
+            <!-- Upload Image Flyer / Poster -->
+            <div class="qs-field">
+                <label class="qs-label">
+                    <span>🖼️ صورة الإعلان أو البوستر / الشعار</span>
+                    <span class="qs-optional">(اختياري)</span>
                 </label>
-                <p style="color: #64748b; font-size: 0.85rem; margin: 0 0 1rem 0;">
-                    إذا كان لديك صورة جاهزة للإعلان على واتساب أو فيسبوك، ارفعها هنا مباشرة وسيتم استخدامها.
-                </p>
-                <input type="file" name="job_image" accept="image/*" style="font-size: 0.9rem;">
+                
+                <div class="qs-upload-box" id="uploadDropZone" onclick="document.getElementById('jobImageInput').click();">
+                    <input type="file" name="job_image" id="jobImageInput" accept="image/*" style="display: none;" onchange="handleImagePreview(event)">
+                    
+                    <div id="uploadPlaceholder" class="qs-upload-content">
+                        <div class="qs-upload-icon">📸</div>
+                        <div class="qs-upload-title">اضغط هنا لاختيار صورة من الموبايل أو اسحب الصورة هنا</div>
+                        <div class="qs-upload-sub">صورة إعلان واتساب أو فيسبوك، أو شعار المكان (JPG, PNG)</div>
+                    </div>
+
+                    <div id="uploadPreview" class="qs-preview-content" style="display: none;">
+                        <img id="previewImg" src="" alt="معاينة الصورة" class="qs-preview-thumb">
+                        <div class="qs-preview-info">
+                            <span id="previewName" class="qs-preview-name"></span>
+                            <button type="button" class="qs-preview-remove" onclick="removeImage(event)">✕ إلغاء الصورة</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Description & Details -->
-            <div>
-                <label style="display: block; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">
-                    تفاصيل وشروط الوظيفة <span style="color: #64748b; font-weight: 400;">(الراتب، ساعات العمل، المؤهل)</span>
+            <div class="qs-field">
+                <label class="qs-label">
+                    <span>📝 تفاصيل وشروط الوظيفة</span>
+                    <span class="qs-optional">(الراتب، ساعات العمل، المؤهل المطلوب، المزايا...)</span>
                 </label>
-                <textarea name="description" rows="4" placeholder="اكتب أي تفاصيل أخرى ترغب في توضيحها للباحثين عن عمل..." 
-                          style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 1rem; outline: none; font-family: inherit; resize: vertical;"></textarea>
+                <textarea name="description" rows="4" 
+                          placeholder="اكتب هنا أي تفاصيل تهم الباحث عن عمل، مثل: المرتب المتوقع، مواعيد العمل، مكان العمل بالتفصيل، وجود مواصلات أو سكن، إلخ..." 
+                          class="qs-textarea"></textarea>
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" style="background: #10b981; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.15rem; font-weight: 800; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem;">
-                أرسل الوظيفة للنشر مجاناً 🚀
-            </button>
+            <div class="qs-submit-box">
+                <button type="submit" class="qs-submit-btn" id="submitBtn">
+                    <span>أرسل الوظيفة للنشر الآن 🚀</span>
+                </button>
+                <p class="qs-footer-note">سيتم مراجعة إعلانك واعتماده لنشره فوراً على منصة فرصة مجاناً</p>
+            </div>
         </form>
     </div>
 
 </div>
+
+<!-- Styles Optimized for Mobile and Modern Touch Devices -->
+<style>
+.qs-page-wrapper {
+    max-width: 780px;
+    margin: 1.5rem auto 3rem;
+    padding: 0 1rem;
+}
+
+/* Modal */
+.qs-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 1rem;
+    animation: qsFadeIn 0.25s ease-out;
+}
+.qs-modal-content {
+    background: #ffffff;
+    border-radius: 24px;
+    max-width: 460px;
+    width: 100%;
+    padding: 2.25rem 1.75rem;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid #e2e8f0;
+    animation: qsScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.qs-modal-icon {
+    width: 72px;
+    height: 72px;
+    background: #ecfdf5;
+    border: 2px solid #a7f3d0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    color: #10b981;
+}
+.qs-modal-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.75rem 0;
+}
+.qs-modal-desc {
+    color: #475569;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0 0 1.75rem 0;
+}
+.qs-modal-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 0.95rem 2.5rem;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    width: 100%;
+    max-width: 260px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.qs-modal-btn:active {
+    transform: scale(0.98);
+}
+
+/* Notice Banner */
+.qs-notice-banner {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 16px;
+    padding: 1.2rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.05);
+}
+.qs-notice-icon {
+    font-size: 1.75rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+.qs-notice-body h4 {
+    margin: 0 0 0.35rem 0;
+    color: #92400e;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.4;
+}
+.qs-notice-body p {
+    margin: 0;
+    color: #78350f;
+    font-size: 0.92rem;
+    line-height: 1.6;
+}
+.qs-notice-body a {
+    color: #0284c7;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* Card */
+.qs-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 2.25rem 2rem;
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06);
+}
+
+/* Header */
+.qs-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.qs-badge {
+    display: inline-block;
+    background: #ecfdf5;
+    color: #059669;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    border: 1px solid #a7f3d0;
+    margin-bottom: 0.75rem;
+}
+.qs-header h2 {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+.qs-header p {
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+/* Error Banner */
+.qs-error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Fields */
+.qs-field {
+    margin-bottom: 1.35rem;
+}
+.qs-label {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+.qs-required {
+    color: #ef4444;
+    font-weight: 900;
+}
+.qs-optional {
+    color: #64748b;
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+.qs-hint {
+    display: block;
+    color: #64748b;
+    font-size: 0.82rem;
+    margin-top: 0.35rem;
+}
+
+/* Inputs & Selects */
+.qs-input,
+.qs-select,
+.qs-textarea {
+    width: 100%;
+    min-height: 50px;
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #0f172a;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+.qs-input:focus,
+.qs-select:focus,
+.qs-textarea:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+.qs-textarea {
+    min-height: 110px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+/* Custom Select Arrow */
+.qs-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+.qs-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-left: 2.5rem;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 1rem center;
+}
+
+/* Grid Layout */
+.qs-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Upload Box */
+.qs-upload-box {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.qs-upload-box:hover {
+    background: #f1f5f9;
+    border-color: #0284c7;
+}
+.qs-upload-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+.qs-upload-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+.qs-upload-sub {
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
+/* Preview */
+.qs-preview-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.qs-preview-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+}
+.qs-preview-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+}
+.qs-preview-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1e293b;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qs-preview-remove {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+    padding: 0.3rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+.qs-preview-remove:hover {
+    background: #fee2e2;
+}
+
+/* Submit Section */
+.qs-submit-box {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+.qs-submit-btn {
+    width: 100%;
+    min-height: 56px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.qs-submit-btn:hover {
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px);
+}
+.qs-submit-btn:active {
+    transform: scale(0.99);
+}
+.qs-footer-note {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 0.85rem;
+    margin-bottom: 0;
+}
+
+/* Keyframes */
+@keyframes qsFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes qsScaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Mobile Adaptations */
+@media (max-width: 639px) {
+    .qs-page-wrapper {
+        margin: 1rem auto 2rem;
+        padding: 0 0.75rem;
+    }
+    .qs-card {
+        padding: 1.5rem 1.15rem;
+        border-radius: 16px;
+    }
+    .qs-header h2 {
+        font-size: 1.45rem;
+    }
+    .qs-header p {
+        font-size: 0.92rem;
+    }
+    .qs-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .qs-input,
+    .qs-select,
+    .qs-textarea {
+        font-size: 16px; /* Prevents iOS auto-zoom */
+        min-height: 48px;
+    }
+    .qs-notice-banner {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .qs-submit-btn {
+        min-height: 52px;
+        font-size: 1.1rem;
+    }
+}
+</style>
+
+<!-- Live Image Preview Script -->
+<script>
+function handleImagePreview(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('previewImg').src = e.target.result;
+        document.getElementById('previewName').textContent = file.name;
+        document.getElementById('uploadPlaceholder').style.display = 'none';
+        document.getElementById('uploadPreview').style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeImage(event) {
+    event.stopPropagation();
+    const input = document.getElementById('jobImageInput');
+    input.value = '';
+    document.getElementById('previewImg').src = '';
+    document.getElementById('uploadPlaceholder').style.display = 'block';
+    document.getElementById('uploadPreview').style.display = 'none';
+}
+
+// Drag & drop support
+const dropZone = document.getElementById('uploadDropZone');
+if (dropZone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = '#0284c7';
+            dropZone.style.background = '#e0f2fe';
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = '#cbd5e1';
+            dropZone.style.background = '#f8fafc';
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+            const fileInput = document.getElementById('jobImageInput');
+            fileInput.files = files;
+            handleImagePreview({ target: { files: files } });
+        }
+    }, false);
+}
+</script>
