@@ -3,7 +3,6 @@ const https = require('https');
 class AiService {
     constructor() {
         this.apiKey = process.env.GEMINI_API_KEY;
-        // gemini-1.5-flash is the stable Google standard for v1beta API
         this.model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
     }
 
@@ -35,47 +34,43 @@ class AiService {
     }
 
     /**
-     * Extracts structured job data from raw Telegram text using Gemini AI or Heuristic Fallback
-     * @param {string} rawText The raw message from Telegram
-     * @param {string} [imageUrl=null] Optional image URL to process
-     * @returns {Promise<Object>} Extracted JSON data
+     * Extracts structured job data from raw Telegram text & image
      */
-    async extractJobData(rawText, imageUrl = null) {
-        // 1. Check Mock Mode
+    async extractJobData(rawText, imageUrl = null, meta = {}) {
         if (process.env.GEMINI_MOCK_MODE === 'true') {
             console.log('🤖 [Mock Mode] AI extraction bypassed.');
-            return this._mockExtraction(rawText);
+            return this._mockExtraction(rawText, meta);
         }
 
-        // 2. If no API key is provided, use the smart heuristic parser directly
         if (!this.apiKey || this.apiKey.trim() === '' || this.apiKey === 'your-gemini-api-key') {
-            console.log('ℹ️ [AI Service] No Gemini API key provided. Using Smart Rule-Based Extractor.');
-            return this.fallbackExtraction(rawText);
+            console.log('ℹ️ [AI Service] Using Smart Rule-Based Extractor.');
+            return this.fallbackExtraction(rawText, imageUrl, meta);
         }
 
-        // 3. Try Gemini AI with safe fallback
         try {
-            return await this._callGeminiAI(rawText, imageUrl);
+            return await this._callGeminiAI(rawText, imageUrl, meta);
         } catch (error) {
             console.warn(`⚠️ [AI Service] Gemini API call failed (${error.message}). Falling back to Smart Rule-Based Extractor.`);
-            return this.fallbackExtraction(rawText);
+            return this.fallbackExtraction(rawText, imageUrl, meta);
         }
     }
 
-    _callGeminiAI(rawText, imageUrl = null) {
+    _callGeminiAI(rawText, imageUrl = null, meta = {}) {
         const prompt = `أنت مساعد ذكي ومحترف لمنصة توظيف مصرية تدعى "فرصة".
-يرجى استخراج بيانات الوظيفة من النص التالي ${imageUrl ? 'والصورة المرفقة ' : ''}وتحويلها إلى كائن JSON صالح فقط بدون أي ماركداون أو نصوص خارج الـ JSON.
+يرجى استخراج بيانات الوظيفة من ${imageUrl ? 'الصورة المرفقة والنص: ' : 'النص التالي: '}
+وتحويلها إلى كائن JSON صالح فقط بدون أي ماركداون أو نصوص خارج الـ JSON.
+إذا كانت الوظيفة معلنة عبر صورة، اقرأ كل النصوص المكتوبة في الصورة واستخرج منها (المسمى، المكان، رقم الهاتف، والراتب).
 إذا لم تجد أي بيان، اجعل قيمته null.
 
-النص:
+النص المرفق إن وجد:
 """
-${rawText}
+${rawText || ''}
 """
 
 المطلوب استخراجه بالصيغة التالية بالضبط:
 {
     "title": "المسمى الوظيفي (مثال: محاسب، عامل إنتاج، فرد أمن، سائق، كاشير)",
-    "company_name": "اسم الشركة أو المكان (إذا لم يذكر اكتب: شركة غير معلنة)",
+    "company_name": "اسم الشركة أو المكان (إذا لم يذكر اكتب: شركة معلنة في البوستر)",
     "description": "وصف واضح ومختصر لشروط ومزايا الوظيفة",
     "requirements": "الشروط والمؤهلات المطلوبة",
     "governorate": "اسم المحافظة في مصر (مثال: القاهرة، الجيزة، الشرقية، الإسكندرية)",
@@ -127,7 +122,7 @@ ${rawText}
                         'Content-Type': 'application/json',
                         'Content-Length': Buffer.byteLength(data)
                     },
-                    timeout: 12000
+                    timeout: 15000
                 };
 
                 const req = https.request(options, (res) => {
@@ -172,10 +167,12 @@ ${rawText}
     /**
      * Smart Rule-Based Extractor specifically tuned for Egyptian recruitment posts
      */
-    fallbackExtraction(rawText) {
-        const text = rawText || '';
-        
-        // 1. Phone Extraction (Supports 01xxxxxxxxx, +201xxxxxxxxx, 00201xxxxxxxxx)
+    fallbackExtraction(rawText, imageUrl = null, meta = {}) {
+        const text = (rawText || '').trim();
+        const channelName = meta.channelName || '';
+        const postNum = meta.postNum || '';
+
+        // 1. Phone Extraction
         const phoneMatch = text.match(/(?:(?:\+?20|0020)?\s?)(01[0125][0-9]{8})/);
         const contactPhone = phoneMatch ? phoneMatch[1] : null;
 
@@ -188,7 +185,7 @@ ${rawText}
             whatsappPhone = contactPhone;
         }
 
-        // 3. Salary Extraction (e.g. مرتب 4000، راتب 5000 إلى 6000)
+        // 3. Salary Extraction
         let salaryMin = null;
         let salaryMax = null;
         const salaryRangeMatch = text.match(/(?:مرتب|راتب|بمرتب|أجر)[\s:]*([0-9]{4,5})[\s]*(?:الى|إلى|-|حتى)[\s]*([0-9]{4,5})/i);
@@ -271,9 +268,9 @@ ${rawText}
             }
         }
 
-        // 8. Title Formulation (First clean readable line)
+        // 8. Title Formulation
+        let title = '';
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
-        let title = 'فرصة عمل جديدة';
         if (lines.length > 0) {
             title = lines[0]
                 .replace(/^(مطلوب|عاجل|وظيفة|اعلان|إعلان|فرصة عمل)[\s:/-]*/i, '')
@@ -283,20 +280,31 @@ ${rawText}
                 title = lines[1].replace(/[💥🔥✨⚡️🚀📢🔴📣]/g, '').trim();
             }
             if (title.length > 70) title = title.substring(0, 70);
-            if (!title) title = 'فرصة عمل شاغرة';
+        }
+
+        // If no title from text, create a clear title with post number and channel
+        if (!title || title.length < 3) {
+            title = postNum ? `إعلان وظيفة مصور #${postNum}` : 'إعلان وظيفة مصور';
+            if (channelName) title += ` (${channelName})`;
         }
 
         // 9. Company Name
-        let companyName = 'شركة غير معلنة';
+        let companyName = 'شركة معلنة في البوستر';
         const compMatch = text.match(/(?:شركة|مصنع|سوبر ماركت|مجموعة|مستشفى|صيدلية|فندق|مطعم)\s+([^\n,.]+)/);
         if (compMatch) {
             companyName = compMatch[0].trim().substring(0, 60);
         }
 
+        // 10. Description
+        let description = text;
+        if (!description || description.length < 20) {
+            description = `وظيفة شاغرة معلنة عبر صورة البوستر المرفقة${channelName ? ' من قناة (' + channelName + ')' : ''}. يرجى الاطلاع على الصورة للتفاصيل وشروط التقديم.`;
+        }
+
         return {
             title,
             company_name: companyName,
-            description: text,
+            description,
             requirements: null,
             governorate: detectedGov,
             suggested_governorate_slug: detectedGovSlug,
@@ -312,11 +320,11 @@ ${rawText}
         };
     }
 
-    _mockExtraction(rawText) {
+    _mockExtraction(rawText, meta = {}) {
         return {
-            title: "محاسب مالي (Mock)",
+            title: meta.postNum ? `محاسب مالي #${meta.postNum}` : "محاسب مالي",
             company_name: "شركة النور",
-            description: rawText,
+            description: rawText || "وصف الوظيفة",
             requirements: "خبرة في برامج الحسابات",
             governorate: "القاهرة",
             suggested_governorate_slug: "cairo",
