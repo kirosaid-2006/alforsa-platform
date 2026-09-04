@@ -63,6 +63,17 @@ sequelize.sync({ force: false })
     .then(async () => {
         console.log('✅ Database synchronized.');
         
+        // Ensure image and URL columns are TEXT in PostgreSQL to support long URLs
+        try {
+            await sequelize.query('ALTER TABLE jobs ALTER COLUMN image_url TYPE TEXT;');
+            await sequelize.query('ALTER TABLE jobs ALTER COLUMN telegram_message_url TYPE TEXT;');
+            await sequelize.query('ALTER TABLE jobs ALTER COLUMN telegram_message_id TYPE TEXT;');
+            await sequelize.query('ALTER TABLE jobs ALTER COLUMN company_logo_url TYPE TEXT;');
+            await sequelize.query('ALTER TABLE jobs ALTER COLUMN company_website TYPE TEXT;');
+        } catch (alterErr) {
+            // Non-critical, ignored on SQLite or if already altered
+        }
+
         // Auto-run seeders to populate roles, permissions, categories, governorates and settings
         await runSeeders(false);
         
