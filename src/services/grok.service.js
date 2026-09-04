@@ -33,6 +33,20 @@ class AiService {
         });
     }
 
+    async getApiKey() {
+        if (this.apiKey && this.apiKey.trim() !== '' && this.apiKey !== 'your-gemini-api-key') {
+            return this.apiKey;
+        }
+        try {
+            const { Setting } = require('../models');
+            const setting = await Setting.findOne({ where: { key: 'gemini_api_key' } });
+            if (setting && setting.value && setting.value.trim() !== '') {
+                return setting.value.trim();
+            }
+        } catch (e) {}
+        return process.env.GEMINI_API_KEY || null;
+    }
+
     /**
      * Extracts structured job data from raw Telegram text & image
      */
@@ -42,53 +56,75 @@ class AiService {
             return this._mockExtraction(rawText, meta);
         }
 
-        if (!this.apiKey || this.apiKey.trim() === '' || this.apiKey === 'your-gemini-api-key') {
-            console.log('ℹ️ [AI Service] Using Smart Rule-Based Extractor.');
+        const effectiveKey = await this.getApiKey();
+
+        if (!effectiveKey || effectiveKey.trim() === '' || effectiveKey === 'your-gemini-api-key') {
+            console.log('ℹ️ [AI Service] Using Smart Rule-Based Extractor (No Gemini Key provided).');
             return this.fallbackExtraction(rawText, imageUrl, meta);
         }
 
         try {
-            return await this._callGeminiAI(rawText, imageUrl, meta);
+            return await this._callGeminiAI(rawText, imageUrl, meta, effectiveKey);
         } catch (error) {
             console.warn(`⚠️ [AI Service] Gemini API call failed (${error.message}). Falling back to Smart Rule-Based Extractor.`);
             return this.fallbackExtraction(rawText, imageUrl, meta);
         }
     }
 
-    _callGeminiAI(rawText, imageUrl = null, meta = {}) {
-        const prompt = `أنت مساعد ذكي ومحترف لمنصة توظيف مصرية تدعى "فرصة".
-يرجى استخراج بيانات الوظيفة من ${imageUrl ? 'الصورة المرفقة والنص: ' : 'النص التالي: '}
-وتحويلها إلى كائن JSON صالح فقط بدون أي ماركداون أو نصوص خارج الـ JSON.
-إذا كانت الوظيفة معلنة عبر صورة، اقرأ كل النصوص المكتوبة في الصورة واستخرج منها (المسمى، المكان، رقم الهاتف، والراتب).
-إذا لم تجد أي بيان، اجعل قيمته null.
+    _callGeminiAI(rawText, imageUrl = null, meta = {}, apiKey = null) {
+        const prompt = `أنت خبير توظيف مصري في منصة "فرصة".
+مهمتك فحص وتفريغ ${imageUrl ? 'صورة البوستر الإعلاني المرفقة بالكامل واستخراج كل كلمة ومعلومة مكتوبة داخل التصميم:' : 'نص الوظيفة التالي:'}
+1. اقرأ كل النصوص المكتوبة في الصورة بدقة متناهية (OCR & Vision).
+2. استخرج المسمى الوظيفي الصريح والمحدد بدقة.
+3. استخرج اسم الشركة أو جهة العمل (إذا لم يذكر اكتب: شركة معلنة).
+4. فرغ كامل التفاصيل المكتوبة بالصورة في حقل "description" (شروط، مزايا، مواعيد العمل، الراتب، المكان).
+5. استخرج أرقام التليفونات للتواصل والواتساب (أرقام مصرية مكونة من 11 رقم تبدأ بـ 01).
+6. حدد الفئة الأنسب للوظيفة بدقة من القائمة المحددة أدناه.
 
 النص المرفق إن وجد:
 """
 ${rawText || ''}
 """
 
-المطلوب استخراجه بالصيغة التالية بالضبط:
+المطلوب إرجاع كائن JSON صالح فقط بدون أي إضافات خارجية بالصيغة التالية:
 {
-    "title": "المسمى الوظيفي (مثال: محاسب، عامل إنتاج، فرد أمن، سائق، كاشير)",
-    "company_name": "اسم الشركة أو المكان (إذا لم يذكر اكتب: شركة معلنة في البوستر)",
-    "description": "وصف واضح ومختصر لشروط ومزايا الوظيفة",
-    "requirements": "الشروط والمؤهلات المطلوبة",
-    "governorate": "اسم المحافظة في مصر (مثال: القاهرة، الجيزة، الشرقية، الإسكندرية)",
-    "city": "المدينة أو المنطقة (مثال: المعادي، 6 أكتوبر، العاشر من رمضان، العبور)",
+    "title": "المسمى الوظيفي المستخرج (مثال: محاسب عام، سائق رخصة ثانية، عامل إنتاج وتعبئة، فني صيانة)",
+    "company_name": "اسم الشركة أو المكان",
+    "description": "تفريغ شامل ومنظم لكافة تفاصيل وشروط ومزايا الوظيفة المكتوبة في الصورة",
+    "requirements": "المؤهل والشروط المطلوبة إن وجدت",
+    "governorate": "اسم المحافظة (القاهرة، الجيزة، الشرقية، الإسكندرية، القليوبية، المنوفية...)",
+    "city": "المدينة أو المنطقة الصناعية إن ذكرت (مثال: العاشر من رمضان، 6 أكتوبر، العبور، المعادي)",
     "salary_min": null,
     "salary_max": null,
     "experience_years": null,
     "qualification": "none",
     "contact_phone": "رقم الهاتف للتواصل (11 رقم يبدأ بـ 01)",
-    "contact_whatsapp": "رقم الواتساب إذا ذكر",
+    "contact_whatsapp": "رقم الواتساب إن وجد",
     "confidence_score": 0.95,
-    "suggested_category_slug": "manual-labor"
+    "suggested_category_slug": "الفئة المناسبة"
 }
 
-ملاحظات:
-- qualification اختر من: none, diploma, institute, bachelors, masters, phd
-- suggested_category_slug اختر من: accounting-finance, manual-labor, drivers, technicians-craftsmen, security, sales, customer-service, it-software, engineering, medical-pharma, education-teaching, management-hr, marketing-advertising, legal, hospitality-food
-- salary_min و salary_max أرقام صحيحة فقط بدون حروف.`;
+خيارات suggested_category_slug الإلزامية:
+- accounting-finance (محاسبين، كاشير، مالية)
+- manual-labor (عمال إنتاج، عمال مخازن، عمال نظافة وتعبئة بدون شهادة)
+- drivers (سائقين، دليفري، مناديب توصيل)
+- technicians-craftsmen (فنيين، كهربائي، ميكانيكي، سباك، نجار، صيانة)
+- security (أفراد أمن وحراسة)
+- sales (مبيعات، سيلز، كول سنتر، بائعين)
+- customer-service (خدمة عملاء)
+- it-software (تكنولوجيا المعلومات وبرمجة)
+- engineering (هندسة ومهندسين)
+- medical-pharma (صيادلة، تمريض، أطباء)
+- education-teaching (تعليم ومدرسين)
+- management-hr (إدارة وموارد بشرية)
+- marketing-advertising (تسويق وإعلان)
+- legal (محاماة واستشارات قانونية)
+- hospitality-food (مطاعم وفنادق، شيف، ويتر، باريستا)
+
+qualification اختر من: none, diploma, institute, bachelors, masters, phd.
+الأرقام في salary_min و salary_max أرقام صحيحة فقط بدون علامات أو نصوص.`;
+
+        const activeApiKey = apiKey || this.apiKey;
 
         return new Promise(async (resolve, reject) => {
             try {
@@ -116,13 +152,13 @@ ${rawText || ''}
 
                 const options = {
                     hostname: 'generativelanguage.googleapis.com',
-                    path: `/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`,
+                    path: `/v1beta/models/${this.model}:generateContent?key=${activeApiKey}`,
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Content-Length': Buffer.byteLength(data)
                     },
-                    timeout: 15000
+                    timeout: 20000
                 };
 
                 const req = https.request(options, (res) => {
