@@ -6,7 +6,7 @@ const deduplicationService = require('../services/deduplication.service');
 
 /**
  * Scrape a public Telegram channel using its web preview HTML
- * Automatically decomposes grouped photo albums (e.g. 10 photos) into individual jobs!
+ * Automatically decomposes grouped photo albums into individual jobs
  * @param {string} username The channel username (e.g. @jobs_egypt or https://t.me/jobs_egypt)
  * @returns {Promise<Array<Object>>} Array of individual job items
  */
@@ -27,7 +27,7 @@ function scrapeTelegramChannel(username) {
         }
 
         const url = `https://t.me/s/${cleanUsername}`;
-        console.log(`📡 [Telegram Scraper] Fetching channel: ${url}`);
+        console.log(`📡 [Telegram Scraper] Fetching: ${url}`);
 
         const options = {
             headers: {
@@ -117,7 +117,7 @@ function scrapeTelegramChannel(username) {
                     }
                 }
 
-                console.log(`📥 [Telegram Scraper] Extracted ${items.length} usable items/photos from @${cleanUsername}`);
+                console.log(`📥 [Telegram Scraper] Extracted ${items.length} items from @${cleanUsername}`);
                 resolve(items);
             });
         });
@@ -137,11 +137,9 @@ function scrapeTelegramChannel(username) {
 
 /**
  * Routine / Manual pull logic
- * @param {string} [specificChannelUsername=null]
- * @param {boolean} [force=false] Force import even if telegram_message_id exists
  */
-async function pullJobsFromTelegram(specificChannelUsername = null, force = false) {
-    console.log(`🤖 [Telegram Cron] Starting telegram pull (Force: ${force})...`);
+async function pullJobsFromTelegram(specificChannelUsername = null) {
+    console.log('🤖 [Telegram Cron] Starting telegram pull...');
     const results = [];
     
     try {
@@ -153,7 +151,7 @@ async function pullJobsFromTelegram(specificChannelUsername = null, force = fals
         const channels = await TelegramChannel.findAll({ where: query });
         
         if (channels.length === 0) {
-            console.log('🤖 [Telegram Cron] No active channels found. Exiting.');
+            console.log('🤖 [Telegram Cron] No active channels found.');
             return [{ channel: specificChannelUsername || 'all', status: 'no_active_channels', fetched: 0, added: 0, duplicates: 0, errors: [] }];
         }
 
@@ -191,8 +189,8 @@ async function pullJobsFromTelegram(specificChannelUsername = null, force = fals
                 const imageUrl = item.imageUrl;
                 const msgId = item.telegram_message_id;
 
-                // --- 1. DATABASE DEDUPLICATION (Skip if not forced) ---
-                if (!force && msgId) {
+                // --- 1. Check if this exact post/image was already imported to DB ---
+                if (msgId) {
                     const alreadyImported = await Job.findOne({ where: { telegram_message_id: msgId } });
                     if (alreadyImported) {
                         console.log(`⏩ [Telegram Cron] Post ${msgId} already exists in DB. Skipping.`);
@@ -204,8 +202,8 @@ async function pullJobsFromTelegram(specificChannelUsername = null, force = fals
                 // Post number from msgId (e.g. "189" from "opp_2026/189")
                 const postNum = msgId && msgId.includes('/') ? msgId.split('/')[1] : (msgId || '');
 
-                // --- 2. Process with AI or Smart Heuristic Rule Engine ---
-                console.log(`🧠 [Processing] Parsing post ${msgId || ''} (@${channel.channel_username})... Has Image: ${imageUrl ? 'Yes' : 'No'}`);
+                // --- 2. Process with AI or Heuristic Rule Engine ---
+                console.log(`🧠 [Processing] Parsing item ${msgId || ''} (@${channel.channel_username})... Image: ${imageUrl ? 'Yes' : 'No'}`);
                 try {
                     const extractedData = await grokService.extractJobData(text, imageUrl, {
                         channelName: channel.channel_name,
@@ -213,7 +211,7 @@ async function pullJobsFromTelegram(specificChannelUsername = null, force = fals
                     });
                     
                     extractedData.source = 'telegram';
-                    extractedData.telegram_message_id = force ? `${msgId || Date.now()}_f${Date.now()}` : msgId;
+                    extractedData.telegram_message_id = msgId;
                     extractedData.telegram_raw_text = text || (imageUrl ? `وظيفة معلنة بالصورة: ${imageUrl}` : '');
                     if (imageUrl) {
                         extractedData.image_url = imageUrl;
@@ -222,8 +220,8 @@ async function pullJobsFromTelegram(specificChannelUsername = null, force = fals
                     const cleanUser = channel.channel_username.replace('@', '');
                     extractedData.telegram_message_url = postNum ? `https://t.me/${cleanUser}/${postNum}` : `https://t.me/${cleanUser}`;
                     
-                    // --- 3. Content deduplication check (Skip if forced) ---
-                    if (!force) {
+                    // --- 3. Content deduplication check ONLY if phone or long text exists ---
+                    if (extractedData.contact_phone || (text && text.length > 80)) {
                         const duplicateResult = await deduplicationService.isDuplicate(extractedData);
                         if (duplicateResult.isDuplicate) {
                             console.log(`⚠️ [Deduplication] Job rejected as duplicate (${duplicateResult.matchLevel}).`);
@@ -295,7 +293,7 @@ async function pullJobsFromTelegram(specificChannelUsername = null, force = fals
             channel.last_scraped_at = new Date();
             await channel.save();
 
-            console.log(`🏁 [Telegram Cron] Finished @${channel.channel_username}: +${channelResult.added} jobs added, ${channelResult.duplicates} duplicates skipped.`);
+            console.log(`🏁 [Telegram Cron] Finished @${channel.channel_username}: +${channelResult.added} added, ${channelResult.duplicates} skipped.`);
             results.push(channelResult);
         }
         
