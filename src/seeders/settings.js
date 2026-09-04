@@ -7,6 +7,7 @@ async function seedSettings() {
     { key: 'telegram_import_enabled', value: 'true', description: 'تفعيل الاستيراد التلقائي من تليجرام', is_public: false },
     { key: 'maintenance_mode', value: 'false', description: 'وضع الصيانة', is_public: true },
     { key: 'survey_reminder_days', value: '15', description: 'عدد الأيام قبل إرسال استبيان التوظيف', is_public: false },
+    { key: 'gemini_api_key', value: '', description: 'Google Gemini AI API Key', is_public: false },
   ];
 
   for (const setting of settings) {
