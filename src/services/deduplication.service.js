@@ -33,7 +33,7 @@ class DeduplicationService {
         const recentDate = new Date();
         recentDate.setDate(recentDate.getDate() - 14); // Check last 14 days
 
-        if (jobData.contact_phone) {
+        if (jobData.contact_phone && jobData.contact_phone.length >= 10) {
             const phoneMatches = await Job.findAll({
                 where: {
                     contact_phone: jobData.contact_phone,
@@ -53,8 +53,15 @@ class DeduplicationService {
             }
         }
 
-        // Level 4: Title + Company Similarity (instead of exact match)
-        if (jobData.title && jobData.company_name) {
+        // Check if company or title is generic (e.g. image-only posts or unknown companies)
+        const genericCompanies = ['شركة غير معلنة', 'شركة غير محددة', 'شركة سرية', 'شركة معلنة في البوستر', 'غير محدد'];
+        const genericTitles = ['فرصة عمل جديدة', 'وظيفة جديدة', 'فرصة عمل شاغرة', 'إعلان وظيفة مصور', 'وظيفة شاغرة'];
+
+        const isGeneric = genericCompanies.some(c => (jobData.company_name || '').includes(c)) ||
+                          genericTitles.some(t => (jobData.title || '').includes(t));
+
+        // Level 4: Title + Company Similarity (only for non-generic specific jobs)
+        if (!isGeneric && jobData.title && jobData.company_name) {
             const recentJobs = await Job.findAll({
                 where: {
                     createdAt: { [Op.gte]: recentDate },
@@ -72,9 +79,8 @@ class DeduplicationService {
             }
         }
 
-        // Level 5: High Description Similarity
-        if (jobData.description) {
-            // Re-use recentJobs or fetch if not fetched
+        // Level 5: High Description Similarity (only for substantive descriptions, not short generic placeholders)
+        if (jobData.description && jobData.description.length > 60 && !jobData.description.includes('صورة البوستر المرفقة')) {
             const recentJobs = await Job.findAll({
                 where: {
                     createdAt: { [Op.gte]: recentDate }
