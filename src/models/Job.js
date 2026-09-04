@@ -33,15 +33,15 @@ const Job = sequelize.define('Job', {
     allowNull: false,
   },
   company_logo_url: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   company_website: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   image_url: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   category_id: {
@@ -148,11 +148,11 @@ const Job = sequelize.define('Job', {
   },
   // Telegram integration fields
   telegram_message_id: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   telegram_message_url: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   telegram_raw_text: {
