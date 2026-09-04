@@ -96,22 +96,19 @@
                                 <td style="padding: 1rem; text-align: center;">
                                     <div style="display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap;">
                                         <% if (ch.is_active) { %>
-                                            <a href="/admin/telegram/<%= ch.id %>/test-pull" class="btn btn-outline" style="padding: 0.3rem 0.65rem; font-size: 0.82rem; border-color: #10b981; color: #059669;" title="سحب الرسائل والبوسترات الجديدة">
+                                            <a href="/admin/telegram/<%= ch.id %>/test-pull" class="btn btn-outline" style="padding: 0.35rem 0.85rem; font-size: 0.85rem; border-color: #10b981; color: #059669; font-weight: 700;" title="سحب الرسائل والبوسترات الجديدة">
                                                 سحب الآن 🔄
-                                            </a>
-                                            <a href="/admin/telegram/<%= ch.id %>/test-pull?force=true" class="btn btn-outline" style="padding: 0.3rem 0.5rem; font-size: 0.78rem; border-color: #f59e0b; color: #d97706;" title="سحب إجباري حتى لو كانت مسجلة مسبقاً">
-                                                إجباري ⚡
                                             </a>
                                         <% } %>
 
                                         <form action="/admin/telegram/<%= ch.id %>/toggle" method="POST" style="margin: 0;">
-                                            <button type="submit" class="btn <%= ch.is_active ? 'btn-danger' : 'btn-success' %>" style="padding: 0.3rem 0.7rem; font-size: 0.82rem;">
+                                            <button type="submit" class="btn <%= ch.is_active ? 'btn-danger' : 'btn-success' %>" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">
                                                 <%= ch.is_active ? 'إيقاف' : 'تفعيل' %>
                                             </button>
                                         </form>
 
                                         <form action="/admin/telegram/<%= ch.id %>/delete" method="POST" style="margin: 0;" onsubmit="return confirm('هل أنت متأكد من حذف هذه القناة نهائياً؟')">
-                                            <button type="submit" class="btn btn-outline" style="padding: 0.3rem 0.5rem; font-size: 0.82rem; color: #ef4444; border-color: #fecaca;" title="حذف القناة">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.35rem 0.6rem; font-size: 0.85rem; color: #ef4444; border-color: #fecaca;" title="حذف القناة">
                                                 🗑️
                                             </button>
                                         </form>
