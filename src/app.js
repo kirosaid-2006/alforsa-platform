@@ -77,15 +77,19 @@ sequelize.sync({ force: false })
         // Auto-run seeders to populate roles, permissions, categories, governorates and settings
         await runSeeders(false);
         
-        // Start background jobs
-        startOutcomeSurveyJob();
-        startExpireJobsJob();
-        telegramPullJob.init();
-        
-        app.listen(PORT, () => {
-            console.log(`🚀 Forsa Server running at http://localhost:${PORT}`);
-        });
+        // Start background jobs only in standalone server environment (not Vercel serverless)
+        if (!process.env.VERCEL) {
+            startOutcomeSurveyJob();
+            startExpireJobsJob();
+            telegramPullJob.init();
+            
+            app.listen(PORT, () => {
+                console.log(`🚀 Forsa Server running at http://localhost:${PORT}`);
+            });
+        }
     })
     .catch(err => {
         console.error('❌ Failed to sync database:', err);
     });
+
+module.exports = app;
