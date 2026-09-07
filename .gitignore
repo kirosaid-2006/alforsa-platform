@@ -1,0 +1,8 @@
+node_modules/
+.env
+database/forsa.sqlite
+temp.html
+telegram_dump.html
+telegram_dump2.html
+.vscode/
+.DS_Store

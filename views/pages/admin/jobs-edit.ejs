@@ -1,0 +1,121 @@
+<!-- Admin Navbar -->
+<%- include('../../partials/admin-sidebar', { path: '/admin/jobs' }) %>
+
+<div style="max-width: 900px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+    
+    <div class="mb-8 border-bottom pb-4" style="border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="color: var(--primary); margin-bottom: 0.5rem;">تعديل الوظيفة: <%= job.title %></h1>
+            <p style="color: var(--text-secondary);">قم بتحديث بيانات الوظيفة وحالتها.</p>
+        </div>
+        <a href="/admin/jobs" class="btn btn-outline">العودة 🔙</a>
+    </div>
+
+
+    <form action="/admin/jobs/<%= job.id %>/edit" method="POST" enctype="multipart/form-data">
+        <!-- 1. الأساسيات -->
+        <h2 class="form-section-title" style="margin-top: 0;">1. البيانات الأساسية للوظيفة</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">المسمى الوظيفي *</label>
+                <input type="text" name="title" class="form-control" value="<%= job.title %>" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">التصنيف *</label>
+                <select name="category_id" class="form-control" required>
+                    <% categories.forEach(cat => { %>
+                        <option value="<%= cat.id %>" <%= job.category_id === cat.id ? 'selected' : '' %>><%= cat.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">اسم الشركة أو المصنع *</label>
+            <input type="text" name="company_name" class="form-control" value="<%= job.company_name %>" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">المحافظة *</label>
+                <select name="governorate_id" class="form-control" required>
+                    <% governorates.forEach(gov => { %>
+                        <option value="<%= gov.id %>" <%= job.governorate_id === gov.id ? 'selected' : '' %>><%= gov.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+        </div>
+
+        <!-- 2. التفاصيل -->
+        <h2 class="form-section-title">2. تفاصيل الوظيفة والشروط</h2>
+        <div class="form-group">
+            <label class="form-label">وصف الوظيفة ومواعيد العمل *</label>
+            <textarea name="description" class="form-control" rows="5" required><%= job.description %></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">المؤهل المطلوب</label>
+                <select name="qualification" class="form-control">
+                    <option value="none" <%= job.qualification === 'none' ? 'selected' : '' %>>بدون مؤهل / يقرأ ويكتب</option>
+                    <option value="diploma" <%= job.qualification === 'diploma' ? 'selected' : '' %>>دبلوم / صنايع / تجارة</option>
+                    <option value="institute" <%= job.qualification === 'institute' ? 'selected' : '' %>>معهد</option>
+                    <option value="bachelors" <%= job.qualification === 'bachelors' ? 'selected' : '' %>>بكالوريوس / ليسانس فأعلى</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">الخبرة المطلوبة (سنوات)</label>
+                <input type="number" name="min_experience_years" class="form-control" value="<%= job.min_experience_years %>">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">ساعات العمل</label>
+                <input type="text" name="working_hours" class="form-control" value="<%= job.working_hours %>">
+            </div>
+            <div class="form-group">
+                <label class="form-label">الراتب (ج.م)</label>
+                <input type="number" name="salary" class="form-control" value="<%= job.salary %>">
+            </div>
+        </div>
+
+        <!-- 3. بيانات التواصل -->
+        <h2 class="form-section-title">3. بيانات التواصل</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">رقم هاتف الاتصال *</label>
+                <input type="text" name="contact_phone" class="form-control" value="<%= job.contact_phone %>" required pattern="[0-9]{11,12}">
+            </div>
+            <div class="form-group">
+                <label class="form-label">رقم الواتساب (اختياري)</label>
+                <input type="text" name="contact_whatsapp" class="form-control" value="<%= job.contact_whatsapp %>" pattern="[0-9]{11,12}">
+            </div>
+        </div>
+
+        <h2 class="form-section-title">4. صورة الإعلان والحالة</h2>
+        <div class="form-group" style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px dashed var(--border); margin-bottom: 2rem;">
+            <label class="form-label">تغيير صورة الإعلان (اتركه فارغاً للاحتفاظ بالصورة الحالية)</label>
+            <% if (job.image_url) { %>
+                <div style="margin-bottom: 1rem;">
+                    <img src="<%= job.image_url %>" style="max-height: 150px; border-radius: 8px;">
+                </div>
+            <% } %>
+            <input type="file" name="job_image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp" style="background: white;">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">حالة الوظيفة</label>
+            <select name="status" class="form-control" style="border-color: var(--primary); background: var(--primary-light);">
+                <option value="published" <%= job.status === 'published' ? 'selected' : '' %>>منشورة (نشطة)</option>
+                <option value="pending" <%= job.status === 'pending' ? 'selected' : '' %>>قيد المراجعة</option>
+                <option value="rejected" <%= job.status === 'rejected' ? 'selected' : '' %>>مرفوضة</option>
+                <option value="closed" <%= job.status === 'closed' ? 'selected' : '' %>>مغلقة (تم الاكتفاء)</option>
+            </select>
+        </div>
+
+        <div class="mt-8">
+            <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.25rem; padding: 1rem;">حفظ التعديلات 💾</button>
+        </div>
+    </form>
+</div>

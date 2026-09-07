@@ -1,0 +1,77 @@
+<!-- Admin Navbar -->
+<%- include('../../partials/admin-sidebar', { path: '/admin/reports' }) %>
+
+<!-- Main Content -->
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h2>بلاغات المستخدمين 🚩</h2>
+    </div>
+
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+        <% if (reports && reports.length > 0) { %>
+            <% reports.forEach(report => { %>
+                <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 1rem; position: relative;">
+                    
+                    <!-- Status Badge -->
+                    <div style="position: absolute; top: 1.5rem; left: 1.5rem;">
+                        <% if (report.status === 'pending') { %>
+                            <span style="background: #fff3cd; color: #856404; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: bold;">قيد المراجعة</span>
+                        <% } else { %>
+                            <span style="background: #d4edda; color: #155724; padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: bold;">محلول</span>
+                        <% } %>
+                    </div>
+
+                    <!-- Job Info -->
+                    <div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">التاريخ: <%= new Date(report.createdAt).toLocaleDateString('ar-EG') %></p>
+                        <% if (report.job) { %>
+                            <h3 style="margin: 0 0 0.25rem 0; font-size: 1.2rem;">
+                                <a href="/jobs/<%= report.job.slug %>" target="_blank" style="color: var(--primary); text-decoration: none;"><%= report.job.title %></a>
+                            </h3>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                🏢 <%= report.job.company_name %> 
+                                <% if (report.job.contact_phone) { %> | 📞 <%= report.job.contact_phone %> <% } %>
+                            </div>
+                        <% } else { %>
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; color: var(--danger);">وظيفة محذوفة</h3>
+                        <% } %>
+                    </div>
+
+                    <!-- Reporter Info -->
+                    <div style="background: var(--bg-body); padding: 0.75rem; border-radius: var(--radius-sm); border-right: 3px solid var(--primary);">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">مُقدم البلاغ:</div>
+                        <div style="font-weight: 600; font-size: 0.95rem;"><%= report.user ? report.user.full_name : 'مستخدم محذوف' %></div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);"><%= report.user ? report.user.email : '' %></div>
+                    </div>
+
+                    <!-- Reason -->
+                    <div style="flex-grow: 1;">
+                        <div style="font-size: 0.85rem; color: var(--danger); font-weight: 600; margin-bottom: 0.5rem;">سبب البلاغ:</div>
+                        <p style="margin: 0; font-size: 0.95rem; color: var(--text-primary); line-height: 1.5; background: #fff5f5; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid #fed7d7;">
+                            <%= report.reason %>
+                        </p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div style="display: flex; gap: 0.5rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <% if (report.status === 'pending') { %>
+                            <form action="/admin/reports/<%= report.id %>/resolve" method="POST" style="flex: 2; margin: 0;">
+                                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.5rem;">تحديد كمحلول</button>
+                            </form>
+                        <% } %>
+                        <form action="/admin/reports/<%= report.id %>/delete" method="POST" style="flex: 1; margin: 0;" onsubmit="return confirm('هل أنت متأكد من حذف هذا البلاغ؟');">
+                            <button type="submit" class="btn btn-outline" style="width: 100%; padding: 0.5rem; border-color: var(--danger); color: var(--danger);">حذف</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--radius); border: 1px solid var(--border);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+                <h3 style="color: var(--text-secondary); margin: 0;">لا توجد بلاغات حالياً!</h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">الأمور كلها تمام ولا توجد أي مشاكل مسجلة.</p>
+            </div>
+        <% } %>
+    </div>
+</div>

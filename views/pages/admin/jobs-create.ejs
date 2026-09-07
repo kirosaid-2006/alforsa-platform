@@ -1,0 +1,99 @@
+<!-- Admin Navbar -->
+<%- include('../../partials/admin-sidebar', { path: '/admin/jobs/create' }) %>
+
+<!-- Main Content -->
+<div>
+        <h2 style="margin-bottom: 2rem;">إضافة وظيفة جديدة ➕</h2>
+
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow-sm);">
+            <form action="/admin/jobs/create" method="POST" enctype="multipart/form-data">
+                
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label class="form-label">المسمى الوظيفي *</label>
+                        <input type="text" name="title" class="form-control" required placeholder="مثال: محاسب، مهندس، عامل إنتاج...">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">اسم الشركة / المصنع *</label>
+                        <input type="text" name="company_name" class="form-control" required placeholder="الشركة المعلنة">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">القسم الأساسي *</label>
+                        <select name="category_id" class="form-control" required>
+                            <% if (locals.categories) { %>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">المحافظة *</label>
+                        <select name="governorate_id" class="form-control" required>
+                            <% if (locals.governorates) { %>
+                                <% governorates.forEach(gov => { %>
+                                    <option value="<%= gov.id %>"><%= gov.name %></option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">وصف الوظيفة (المهام، الشروط، المميزات) *</label>
+                    <textarea name="description" class="form-control" rows="6" required placeholder="اكتب تفاصيل الوظيفة هنا بدقة..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">المؤهل المطلوب</label>
+                        <select name="qualification" class="form-control">
+                            <option value="">غير محدد</option>
+                            <option value="none">بدون مؤهل</option>
+                            <option value="diploma">دبلوم / مؤهل متوسط</option>
+                            <option value="institute">معهد / فوق متوسط</option>
+                            <option value="bachelors">بكالوريوس / ليسانس</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الحد الأدنى لسنوات الخبرة (اكتب 0 لو بدون خبرة)</label>
+                        <input type="number" name="min_experience_years" class="form-control" placeholder="مثال: 0, 1, 3">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">عدد ساعات العمل (اختياري)</label>
+                        <input type="text" name="working_hours" class="form-control" placeholder="مثال: 8 ساعات، وردية مسائية 12 ساعة">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">الراتب المتوقع (اختياري)</label>
+                        <input type="text" name="salary" class="form-control" placeholder="مثال: 5000 - 7000 جنيه">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">رقم الهاتف للتواصل *</label>
+                        <input type="text" name="contact_phone" class="form-control" required placeholder="رقم الموبايل للتواصل">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">رقم الواتساب (اختياري)</label>
+                        <input type="text" name="contact_whatsapp" class="form-control" placeholder="اختياري">
+                    </div>
+                </div>
+
+                <div class="form-group" style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px dashed var(--border); margin-bottom: 2rem;">
+                    <label class="form-label">صورة إعلان الوظيفة (اختياري)</label>
+                    <input type="file" name="job_image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp" style="background: white;">
+                    <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">يمكنك رفع صورة للإعلان أو اللوجو الخاص بالشركة لتظهر للباحثين عن عمل.</small>
+                </div>
+
+                <div class="mt-8 pt-4" style="border-top: 1px solid var(--border);">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2.5rem; font-size: 1.1rem;">نشر الوظيفة مباشرة</button>
+                    <a href="/admin" class="btn btn-outline" style="margin-right: 1rem;">إلغاء</a>
+                </div>
+            </form>
+        </div>
+    </div>
+

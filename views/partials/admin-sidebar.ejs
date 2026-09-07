@@ -1,0 +1,58 @@
+<div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 2rem; padding: 0.5rem; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    
+    <div style="display: flex; align-items: center; gap: 1rem; padding-right: 1rem;">
+        <div style="width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            👑
+        </div>
+        <div>
+            <h3 style="margin: 0; font-size: 1.1rem;">لوحة الإدارة</h3>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);"><%= user ? user.full_name : 'مدير النظام' %></p>
+        </div>
+    </div>
+
+    <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 0.5rem; flex-wrap: wrap;">
+        <li>
+            <a href="/admin" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin' ? '700' : '600' %>; background: <%= path === '/admin' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">📊</span> نظرة عامة
+            </a>
+        </li>
+        <li>
+            <a href="/admin/jobs" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin/jobs' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin/jobs' ? '700' : '600' %>; background: <%= path === '/admin/jobs' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">💼</span> إدارة الوظائف
+            </a>
+        </li>
+        <li>
+            <a href="/admin/jobs/pending" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin/jobs/pending' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin/jobs/pending' ? '700' : '600' %>; background: <%= path === '/admin/jobs/pending' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">⏳</span> مراجعة الوظائف
+                <% if (locals.pendingCount && pendingCount > 0) { %>
+                    <span class="badge badge-warning" style="padding: 0.1rem 0.5rem; font-size: 0.75rem; margin-right: 0.5rem;"><%= pendingCount %></span>
+                <% } %>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/jobs/create" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin/jobs/create' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin/jobs/create' ? '700' : '600' %>; background: <%= path === '/admin/jobs/create' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">➕</span> إضافة وظيفة
+            </a>
+        </li>
+        <li>
+            <a href="/admin/users" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin/users' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin/users' ? '700' : '600' %>; background: <%= path === '/admin/users' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">👥</span> المستخدمين
+            </a>
+        </li>
+        <li>
+            <a href="/admin/analytics" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin/analytics' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin/analytics' ? '700' : '600' %>; background: <%= path === '/admin/analytics' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">📈</span> الإحصائيات
+            </a>
+        </li>
+        <li>
+            <a href="/admin/telegram" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin/telegram' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin/telegram' ? '700' : '600' %>; background: <%= path === '/admin/telegram' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">🤖</span> تليجرام
+            </a>
+        </li>
+        <li>
+            <a href="/admin/reports" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/admin/reports' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/admin/reports' ? '700' : '600' %>; background: <%= path === '/admin/reports' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">🚩</span> البلاغات
+            </a>
+        </li>
+    </ul>
+</div>

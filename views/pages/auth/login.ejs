@@ -1,0 +1,32 @@
+<div style="max-width: 450px; margin: 2rem auto; background: white; padding: 2.5rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+    <div class="text-center mb-8">
+        <h1 style="color: var(--primary);">تسجيل الدخول</h1>
+        <p>مرحباً بك مجدداً في منصة فرصة</p>
+    </div>
+
+    <form action="/auth/login" method="POST">
+        <div class="form-group">
+            <label class="form-label">رقم الهاتف أو البريد الإلكتروني</label>
+            <input type="text" name="login_identifier" class="form-control" required placeholder="01xxxxxxxxx">
+        </div>
+
+        <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <label class="form-label" style="margin-bottom: 0;">كلمة المرور</label>
+                <a href="/auth/forgot-password" style="font-size: 0.85rem; color: var(--primary);">نسيت كلمة المرور؟</a>
+            </div>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+
+        <div class="checkbox-group mb-4">
+            <input type="checkbox" name="remember" id="remember">
+            <label for="remember">تذكرني على هذا الجهاز</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">دخول</button>
+        
+        <div class="text-center mt-4">
+            ليس لديك حساب؟ <a href="/auth/register" style="font-weight: 700;">إنشاء حساب جديد كباحث عن عمل</a>
+        </div>
+    </form>
+</div>

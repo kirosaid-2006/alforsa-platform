@@ -1,0 +1,250 @@
+/* EXACT COLORS */
+:root {
+  --navy-900: #0b1220;
+  --navy-800: #111d31;
+  --navy-700: #1a2d4a;
+  --amber-500: #f59e0b;
+  --amber-400: #fbbf24;
+  --amber-300: #fcd34d;
+  --amber-50: #fffbeb;
+  --white: #ffffff;
+  --slate-50: #f8fafc;
+  --slate-900: #0f172a;
+  --slate-500: #64748b;
+  --slate-200: #e2e8f0;
+  --green-500: #10b981;
+  --red-500: #ef4444;
+  --orange-500: #f97316;
+  
+  /* OVERRIDE ANY OLD BLUES GLOBALLY */
+  --primary: var(--amber-500) !important;
+  --primary-hover: var(--amber-400) !important;
+  --primary-light: var(--amber-50) !important;
+  --blue-600: var(--navy-800) !important;
+  --blue-500: var(--navy-700) !important;
+  --blue-50: var(--amber-50) !important;
+}
+
+body {
+  background-color: var(--slate-50) !important;
+  color: var(--slate-900) !important;
+  font-family: 'Cairo', sans-serif !important;
+  animation: pageSlideIn 0.4s ease-out forwards;
+}
+
+p, .text-muted, .s-text-muted, .f-subtitle, .f-feature, .f-trust-item {
+  color: var(--slate-500) !important;
+}
+
+/* ============================================================
+   1. STAGGERED FADE-UP ENTRANCE
+   ============================================================ */
+.saas-fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: saasFadeUpAnim 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes saasFadeUpAnim {
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-1 { animation-delay: 80ms; }
+.stagger-2 { animation-delay: 160ms; }
+.stagger-3 { animation-delay: 240ms; }
+.stagger-4 { animation-delay: 320ms; }
+.stagger-5 { animation-delay: 400ms; }
+.stagger-6 { animation-delay: 480ms; }
+.stagger-7 { animation-delay: 560ms; }
+
+/* ============================================================
+   2. PULSING DOT ANIMATION
+   ============================================================ */
+.pulse-dot {
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: var(--green-500);
+  border-radius: 50%;
+  margin-left: 8px; /* RTL */
+  box-shadow: 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseDotAnim 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+@keyframes pulseDotAnim {
+  100% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+}
+
+/* ============================================================
+   3. FLOATING RADIAL GLOW BLOBS
+   ============================================================ */
+.dark-section, .f-hero {
+  position: relative;
+  background-color: var(--navy-900) !important;
+  color: var(--white) !important;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.glow-blob-1, .glow-blob-2 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  opacity: 0.5;
+  animation: floatGlow 15s ease-in-out infinite alternate;
+}
+.glow-blob-1 {
+  width: 40vw; height: 40vw;
+  background: radial-gradient(circle, var(--navy-700), transparent);
+  top: -10vw; right: -10vw;
+}
+.glow-blob-2 {
+  width: 30vw; height: 30vw;
+  background: radial-gradient(circle, var(--amber-500), transparent);
+  bottom: -5vw; left: -5vw;
+  opacity: 0.3;
+  animation-delay: -5s;
+}
+@keyframes floatGlow {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, 50px) scale(1.1); }
+  100% { transform: translate(50px, -50px) scale(0.9); }
+}
+
+/* ============================================================
+   4. DOT GRID TEXTURE OVERLAY
+   ============================================================ */
+.dot-grid-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ============================================================
+   5. INFINITE HORIZONTAL TICKER
+   ============================================================ */
+.f-ticker-track {
+  animation-play-state: running;
+}
+.f-ticker:hover .f-ticker-track {
+  animation-play-state: paused !important;
+}
+
+/* ============================================================
+   6. CARDS ANIMATIONS (LIFT, SHADOW, AMBER BORDER)
+   ============================================================ */
+.s-card, .f-cat-card, .f-step-card, .job-card {
+  background: var(--white) !important;
+  border: 1px solid var(--slate-200) !important;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease !important;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Amber bottom border slides in */
+.s-card::after, .f-cat-card::after, .f-step-card::after, .job-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%; right: 50%;
+  height: 3px;
+  background: var(--amber-500);
+  transition: left 0.4s ease, right 0.4s ease;
+  z-index: 2;
+}
+
+.s-card:hover, .f-cat-card:hover, .f-step-card:hover, .job-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.04) !important;
+  border-color: var(--amber-300) !important;
+}
+
+.s-card:hover::after, .f-cat-card:hover::after, .f-step-card:hover::after, .job-card:hover::after {
+  left: 0; right: 0;
+}
+
+/* ============================================================
+   7. AMBER GLOW RING ON INPUTS
+   ============================================================ */
+.s-input, .f-search-input, .form-control {
+  border: 1px solid var(--slate-200) !important;
+  background: var(--white) !important;
+  color: var(--slate-900) !important;
+  transition: all 0.2s ease !important;
+}
+.s-input:focus, .f-search-input:focus, .form-control:focus {
+  outline: none !important;
+  border-color: var(--amber-500) !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2) !important;
+}
+
+/* ============================================================
+   8. BUTTON SHADOW INTENSIFIES
+   ============================================================ */
+.btn-primary, .s-btn-primary, .f-search-btn {
+  background: var(--amber-500) !important;
+  color: var(--navy-900) !important;
+  border: none !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.btn-primary:hover, .s-btn-primary:hover, .f-search-btn:hover {
+  background: var(--amber-400) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* ============================================================
+   9. FROSTED GLASS BLUR NAV
+   ============================================================ */
+.f-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ============================================================
+   10. SKELETON SHIMMER (For lazy loading elements)
+   ============================================================ */
+.skeleton-shimmer {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #100%);
+  background-repeat: no-repeat;
+  background-size: 800px 100%; 
+  animation: shimmer 1.5s infinite linear forwards;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+/* Fix Hero Elements explicitly to NOT be blue */
+.f-hero .f-title {
+  color: var(--white) !important;
+}
+.f-title-accent {
+  color: var(--amber-400) !important;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Ticker text color */
+.f-ticker-item {
+  background: rgba(255,255,255,0.1) !important;
+  color: var(--white) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+.f-step-icon {
+  background: var(--amber-50) !important;
+  color: var(--amber-500) !important;
+}

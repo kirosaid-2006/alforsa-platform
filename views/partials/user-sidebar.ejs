@@ -1,0 +1,40 @@
+<!-- User Navbar -->
+<div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 2rem; padding: 0.5rem; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    
+    <div style="display: flex; align-items: center; gap: 1rem; padding-right: 1rem;">
+        <div style="width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800;">
+            <%= user.full_name.substring(0, 1) %>
+        </div>
+        <div>
+            <h3 style="margin: 0; font-size: 1.1rem;"><%= user.full_name %></h3>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);"><%= user.last_job_title || 'باحث عن عمل' %></p>
+        </div>
+    </div>
+
+    <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 0.5rem; flex-wrap: wrap;">
+        <li>
+            <a href="/user/dashboard" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/user/dashboard' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/user/dashboard' ? '700' : '600' %>; background: <%= path === '/user/dashboard' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">📊</span> لوحة التحكم
+            </a>
+        </li>
+        <li>
+            <a href="/user/profile" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/user/profile' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/user/profile' ? '700' : '600' %>; background: <%= path === '/user/profile' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">👤</span> ملفي الشخصي
+            </a>
+        </li>
+        <li>
+            <a href="/user/my-applications" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: <%= path === '/user/my-applications' ? 'var(--primary)' : 'var(--text-secondary)' %>; font-weight: <%= path === '/user/my-applications' ? '700' : '600' %>; background: <%= path === '/user/my-applications' ? 'var(--primary-light)' : 'transparent' %>; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">📄</span> تقديماتي
+                <% if (locals.pendingSurveys && pendingSurveys > 0) { %>
+                    <span class="badge badge-danger" style="padding: 0.1rem 0.5rem; font-size: 0.75rem; margin-right: 0.5rem;"><%= pendingSurveys %></span>
+                <% } %>
+            </a>
+        </li>
+
+        <li>
+            <a href="/auth/logout" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--danger); font-weight: 600; background: transparent; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">🚪</span> خروج
+            </a>
+        </li>
+    </ul>
+</div>

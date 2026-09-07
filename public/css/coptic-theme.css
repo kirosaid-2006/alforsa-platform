@@ -1,0 +1,518 @@
+/* Coptic Modern SaaS UI - 80% Modern, 20% Coptic Heritage */
+
+:root {
+  /* Coptic Inspired Palette */
+  --c-burgundy-900: #3a0a10;
+  --c-burgundy-800: #541018;
+  --c-burgundy-700: #731522;
+  --c-burgundy: #901a2b; /* Primary Brand */
+  --c-burgundy-light: #ad283a;
+  
+  --c-gold-dark: #b8860b;
+  --c-gold: #c5a059; /* Accent */
+  --c-gold-light: #dfc893;
+  --c-gold-50: #fbf8f1;
+  
+  --c-ivory: #fffff0;
+  --c-beige: #f5f5dc;
+  --c-brown-warm: #8b4513;
+
+  /* SaaS Neutrals */
+  --c-surface: #ffffff;
+  --c-surface-hover: #f9f9fa;
+  --c-text-main: #1f2937;
+  --c-text-muted: #6b7280;
+  --c-border: #e5e7eb;
+}
+
+/* Background Overlay Logic (Coptic Old Paper) */
+/* Assuming the paper is named coptic-bg.jpg. 
+   We use a pseudo-element on the body to keep it light without affecting readability */
+body {
+  position: relative;
+  background-color: var(--c-ivory);
+  color: var(--c-text-main);
+  font-family: 'Cairo', 'Inter', sans-serif;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/images/coptic-bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.05; /* VERY subtle */
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 1. Navbar - Frosted Glass & Coptic Hints */
+.c-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 240, 0.85); /* Ivory semi-transparent */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.2); /* Subtle gold border */
+  box-shadow: 0 4px 20px rgba(58, 10, 16, 0.03); /* Subtle burgundy shadow */
+}
+
+.c-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.c-logo {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--c-burgundy-900);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Very subtle cross/star motif next to logo instead of a dot */
+.c-logo-icon {
+  color: var(--c-gold);
+  width: 18px;
+  height: 18px;
+}
+
+.c-nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.c-nav-links a {
+  text-decoration: none;
+  color: var(--c-text-main);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.c-nav-links a:hover {
+  color: var(--c-burgundy);
+}
+
+/* Gold underline on hover */
+.c-nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: var(--c-gold);
+  transition: width 0.3s ease;
+}
+.c-nav-links a:hover::after { width: 100%; }
+
+/* Buttons */
+.c-btn-primary {
+  background: var(--c-burgundy);
+  color: var(--c-ivory);
+  padding: 10px 24px;
+  border-radius: 8px; /* SaaS rounded */
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid var(--c-burgundy-800);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(144, 26, 43, 0.2);
+}
+
+.c-btn-primary:hover {
+  background: var(--c-burgundy-800);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(144, 26, 43, 0.3);
+}
+
+.c-btn-outline {
+  color: var(--c-burgundy);
+  padding: 10px 24px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.c-btn-outline:hover { color: var(--c-burgundy-800); }
+
+
+/* 2. Hero Section */
+.c-hero {
+  position: relative;
+  background: linear-gradient(135deg, var(--c-burgundy-900) 0%, var(--c-burgundy-700) 100%);
+  padding: 6rem 5% 7rem;
+  text-align: center;
+  color: var(--c-ivory);
+  overflow: hidden;
+  border-bottom: 4px solid var(--c-gold); /* Subtle gold trim */
+}
+
+/* Very faint geometric Coptic background pattern in hero */
+.c-hero-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: radial-gradient(var(--c-gold) 1px, transparent 1px),
+  radial-gradient(var(--c-gold) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+  pointer-events: none;
+}
+
+.c-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.c-hero-eyebrow {
+  display: inline-block;
+  background: rgba(197, 160, 89, 0.15); /* Gold tint */
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  color: var(--c-gold-light);
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
+}
+
+.c-hero-title {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.c-hero-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 240, 0.85);
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  line-height: 1.6;
+}
+
+/* Glass Search Bar */
+.c-search-bar {
+  display: flex;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 8px;
+  border-radius: 16px; /* Modern SaaS */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 0 2px rgba(197, 160, 89, 0.3); /* Gold ring */
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.c-search-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-left: 1px solid var(--c-border);
+}
+.c-search-input-group:last-child { border-left: none; }
+
+.c-search-icon { color: var(--c-gold); margin-left: 12px; }
+
+.c-search-bar input, .c-search-bar select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1.1rem;
+  color: var(--c-text-main);
+  font-family: inherit;
+  padding: 14px 0;
+}
+
+.c-search-btn {
+  background: var(--c-gold);
+  color: var(--c-burgundy-900);
+  border: none;
+  padding: 0 40px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.c-search-btn:hover {
+  background: var(--c-gold-light);
+  transform: scale(1.02);
+}
+
+
+/* 3. Main Services (3 Cards) */
+.c-services {
+  padding: 6rem 5%;
+  background: transparent; /* Lets paper show */
+}
+
+.c-section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.c-section-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--c-burgundy-900);
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+.c-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--c-gold);
+}
+
+.c-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.c-service-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+  /* Very subtle coptic geometric corner hints */
+}
+
+.c-service-card::before, .c-service-card::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  transition: all 0.4s ease;
+}
+.c-service-card::before { top: 10px; right: 10px; border-top-color: var(--c-gold); border-right-color: var(--c-gold); opacity: 0; }
+.c-service-card::after { bottom: 10px; left: 10px; border-bottom-color: var(--c-gold); border-left-color: var(--c-gold); opacity: 0; }
+
+.c-service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(58, 10, 16, 0.08);
+  border-color: var(--c-gold);
+}
+.c-service-card:hover::before, .c-service-card:hover::after { opacity: 0.5; }
+
+.c-service-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--c-gold-50);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: var(--c-burgundy);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+}
+
+.c-service-card h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--c-burgundy-900);
+  margin-bottom: 1rem;
+}
+.c-service-card p {
+  color: var(--c-text-muted);
+  line-height: 1.7;
+}
+
+
+/* 4. Featured Jobs (80% SaaS Modern) */
+.c-jobs {
+  padding: 5rem 5% 7rem;
+  background: var(--c-gold-50); /* Very light beige/gold */
+  border-top: 1px solid rgba(197, 160, 89, 0.1);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.1);
+}
+
+.c-jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.c-job-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.c-job-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  border-color: var(--c-burgundy-light);
+}
+
+.c-job-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+.c-job-logo {
+  width: 50px; height: 50px;
+  background: #f3f4f6; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; color: var(--c-burgundy); border: 1px solid var(--c-border);
+}
+.c-job-info h4 { font-size: 1.15rem; font-weight: 800; color: var(--c-text-main); margin-bottom: 4px; }
+.c-job-info p { font-size: 0.9rem; color: var(--c-text-muted); }
+
+.c-job-badges { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.c-badge {
+  background: var(--c-gold-50);
+  color: var(--c-burgundy-800);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.c-job-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--c-border);
+  padding-top: 1rem;
+}
+.c-job-salary { font-weight: 800; color: var(--c-burgundy); }
+.c-job-apply {
+  background: var(--c-surface);
+  color: var(--c-burgundy);
+  border: 1px solid var(--c-burgundy);
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.c-job-card:hover .c-job-apply {
+  background: var(--c-burgundy);
+  color: var(--c-ivory);
+}
+
+
+/* 5. Footer (Luxurious Burgundy) */
+.c-footer {
+  background: var(--c-burgundy-900);
+  color: var(--c-gold-light);
+  padding: 5rem 5% 2rem;
+  position: relative;
+  overflow: hidden;
+  border-top: 2px solid var(--c-gold);
+}
+
+/* Subtle Coptic pattern overlay in footer */
+.c-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--c-burgundy-700) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.2;
+}
+
+.c-footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.c-footer-brand h2 {
+  color: var(--c-gold);
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.c-footer-brand p {
+  color: rgba(223, 200, 147, 0.8);
+  line-height: 1.7;
+  max-width: 400px;
+}
+
+.c-footer h4 {
+  color: var(--c-ivory);
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+.c-footer ul { list-style: none; padding: 0; margin: 0; }
+.c-footer ul li { margin-bottom: 0.8rem; }
+.c-footer ul a {
+  color: rgba(223, 200, 147, 0.8);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.c-footer ul a:hover { color: var(--c-gold); }
+
+.c-footer-bottom {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.2);
+  text-align: center;
+  color: rgba(223, 200, 147, 0.6);
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .c-nav-links { display: none; }
+  .c-search-bar { flex-direction: column; background: transparent; box-shadow: none; padding: 0; }
+  .c-search-input-group { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: 12px; margin-bottom: 10px; width: 100%; border-left: none; }
+  .c-search-btn { width: 100%; padding: 16px; border-radius: 12px; }
+  .c-services-grid { grid-template-columns: 1fr; }
+  .c-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+}

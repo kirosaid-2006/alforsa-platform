@@ -1,0 +1,107 @@
+<!-- Employer Navbar -->
+<div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 2rem; padding: 0.5rem; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    
+    <div style="display: flex; align-items: center; gap: 1rem; padding-right: 1rem;">
+        <div style="width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            🏢
+        </div>
+        <div>
+            <h3 style="margin: 0; font-size: 1.1rem;"><%= user.full_name %></h3>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">صاحب عمل</p>
+        </div>
+    </div>
+
+    <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 0.5rem; flex-wrap: wrap;">
+        <li>
+            <a href="/employer" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--primary); font-weight: 700; background: var(--primary-light); transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">📊</span> لوحة التحكم
+            </a>
+        </li>
+        <li>
+            <a href="/employer/jobs" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--text-secondary); font-weight: 600; background: transparent; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">💼</span> وظائفي المنشورة
+            </a>
+        </li>
+        <li>
+            <a href="/employer/post-job" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--text-secondary); font-weight: 600; background: transparent; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">➕</span> نشر وظيفة
+            </a>
+        </li>
+        <li>
+            <a href="/auth/logout" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: var(--radius-sm); color: var(--danger); font-weight: 600; background: transparent; transition: background 0.3s;">
+                <span style="font-size: 1.1rem;">🚪</span> خروج
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div>
+        <h2 style="margin-bottom: 2rem;">مرحباً بك في لوحة الشركات</h2>
+
+        <!-- Stats -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;"><%= locals.activeJobsCount || 0 %></div>
+                <div style="color: var(--text-secondary); font-weight: 600;">وظائف نشطة</div>
+            </div>
+            
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;"><%= locals.totalViews || 0 %></div>
+                <div style="color: var(--text-secondary); font-weight: 600;">إجمالي المشاهدات</div>
+            </div>
+            
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--success); margin-bottom: 0.5rem;"><%= locals.totalUnlocks || 0 %></div>
+                <div style="color: var(--text-secondary); font-weight: 600;">باحثين مهتمين</div>
+                <small style="color: var(--text-muted);">ضغطوا على (تقديم)</small>
+            </div>
+        </div>
+
+        <!-- Recent Jobs List -->
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <h3 style="margin: 0;">أحدث وظائفك</h3>
+            </div>
+
+            <% if (locals.jobs && jobs.length > 0) { %>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <% jobs.forEach(job => { %>
+                        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin-bottom: 0.25rem;"><a href="/jobs/<%= job.slug %>" target="_blank"><%= job.title %></a></h4>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                    نُشرت في: <%= new Date(job.createdAt).toLocaleDateString('ar-EG') %>
+                                </div>
+                                <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                                    <span>👁️ <%= job.views_count %> مشاهدة</span>
+                                    <span>👥 <%= job.applications_count %> مهتم</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
+                                <% if(job.status === 'published') { %>
+                                    <span class="badge badge-success">نشط ومأمون</span>
+                                <% } else if(job.status === 'pending') { %>
+                                    <span class="badge badge-warning">قيد المراجعة</span>
+                                <% } else if(job.status === 'rejected') { %>
+                                    <span class="badge badge-danger">مرفوض</span>
+                                <% } else { %>
+                                    <span class="badge badge-primary"><%= job.status %></span>
+                                <% } %>
+                                
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <a href="/employer/jobs/<%= job.id %>/edit" class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">تعديل</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-8">
+                    <p>لم تقم بنشر أي وظائف حتى الآن.</p>
+                    <a href="/employer/post-job" class="btn btn-primary mt-2">انشر وظيفتك الأولى مجاناً</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+

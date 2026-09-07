@@ -1,0 +1,56 @@
+<div style="max-width: 600px; margin: 2rem auto; background: white; padding: 2.5rem; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">📝</span>
+        <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 0.5rem;">استبيان نتيجة التوظيف</h1>
+        <p style="color: var(--text-secondary);">لقد مر أكثر من 15 يوماً على تقديمك لوظيفة <strong style="color: var(--text-primary);">"<%= application.Job.title %>"</strong> في شركة <strong style="color: var(--text-primary);">"<%= application.Job.company_name %>"</strong>.</p>
+    </div>
+
+    <form action="/user/survey/<%= application.id %>" method="POST">
+        <h3 class="form-section-title" style="margin-top: 0;">ما هي نتيجة تقديمك لهذه الوظيفة؟</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+            <div class="checkbox-group" style="background: var(--bg-body); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <input type="radio" name="outcome" value="hired" id="out_hired" required>
+                <label for="out_hired" style="font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%;">🎉 تم تعييني في هذه الشركة</label>
+            </div>
+            
+            <div class="checkbox-group" style="background: var(--bg-body); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <input type="radio" name="outcome" value="rejected" id="out_rejected" required>
+                <label for="out_rejected" style="font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%;">❌ تم رفض طلبي</label>
+            </div>
+            
+            <div class="checkbox-group" style="background: var(--bg-body); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <input type="radio" name="outcome" value="waiting" id="out_waiting" required>
+                <label for="out_waiting" style="font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%;">⏳ ما زلت أنتظر رداً من الشركة (أو أتممت المقابلة وأنتظر الرد)</label>
+            </div>
+            
+            <div class="checkbox-group" style="background: var(--bg-body); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                <input type="radio" name="outcome" value="no_contact" id="out_nocontact" required>
+                <label for="out_nocontact" style="font-size: 1.1rem; font-weight: 600; cursor: pointer; width: 100%;">🔇 لم أتواصل مع الشركة أصلاً / لم يتواصلوا معي</label>
+            </div>
+        </div>
+
+        <!-- Conditional Field (Shown only if Hired) -->
+        <div id="via_platform_group" style="display: none; background: var(--success-bg); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid #a7f3d0; margin-bottom: 2rem;">
+            <h4 style="color: var(--success); margin-bottom: 1rem;">هل حصولك على هذه الوظيفة كان بفضل منصة فرصة؟</h4>
+            <div style="display: flex; gap: 2rem;">
+                <div class="checkbox-group">
+                    <input type="radio" name="via_platform" value="true" id="via_yes">
+                    <label for="via_yes" style="font-weight: 600;">نعم</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="radio" name="via_platform" value="false" id="via_no">
+                    <label for="via_no" style="font-weight: 600;">لا (عن طريق مصدر آخر)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">ملاحظات إضافية (اختياري)</label>
+            <textarea name="notes" class="form-control" rows="3" placeholder="هل هناك ما تود إضافته عن تجربتك مع هذه الشركة؟..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="font-size: 1.1rem; padding: 1rem;">إرسال الاستبيان شكراً لك</button>
+    </form>
+</div>

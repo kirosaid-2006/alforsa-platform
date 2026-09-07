@@ -1,0 +1,31 @@
+/* NEW 2026 DESIGN RESET */
+.fursa-wrap *, .f-nav *, .f-footer * {
+  box-sizing: border-box;
+}
+
+.fursa-wrap h1, .fursa-wrap h2, .fursa-wrap h3, .fursa-wrap p, .fursa-wrap ul, .f-nav ul, .f-footer p, .f-footer ul {
+  margin: 0;
+  padding: 0;
+}
+
+.f-nav-links, .f-footer-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.f-hero-inner p {
+  margin: 0 auto 2rem;
+}
+
+.f-section-title {
+  margin-bottom: 0.4rem;
+}
+
+.f-step-title {
+  margin-bottom: 0.4rem;
+}
+
+.f-cta-title {
+  margin-bottom: 0.75rem;
+}

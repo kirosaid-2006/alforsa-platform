@@ -1,0 +1,79 @@
+<!-- User Navbar -->
+<%- include('../../partials/user-sidebar', { path: '/user/dashboard' }) %>
+
+<!-- Main Content -->
+<div>
+        <h2>مرحباً، <%= user.full_name.split(' ')[0] %> 👋</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">إليك ملخص لنشاطك على منصة فرصة</p>
+
+        <!-- Stats Row -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm);">
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;"><%= locals.applicationsCount || 0 %></div>
+                <div style="color: var(--text-secondary); font-weight: 600;">الوظائف التي قدمت عليها</div>
+            </div>
+
+        </div>
+
+        <!-- Pending Surveys Banner inside dashboard -->
+        <% if (locals.pendingSurveys && pendingSurveys > 0) { %>
+            <div style="background: var(--danger-bg); border: 1px solid #fecaca; border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3 style="color: var(--danger); margin-bottom: 0.5rem;">⚠️ استبيانات التوظيف المعلقة</h3>
+                    <p style="margin: 0; color: var(--text-secondary);">يوجد <%= pendingSurveys %> وظيفة مرت 15 يوماً على تقديمك لها. يرجى إخبارنا بنتيجة التقديم لمساعدتنا.</p>
+                </div>
+                <a href="/user/my-applications" class="btn btn-danger">الرد الآن</a>
+            </div>
+        <% } %>
+
+        <!-- Recent Applications -->
+        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <h3 style="margin: 0;">أحدث تقديماتك</h3>
+                <a href="/user/my-applications">عرض الكل</a>
+            </div>
+
+            <% if (locals.recentApplications && recentApplications.length > 0) { %>
+                <% recentApplications.forEach(app => { %>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border);">
+                        <div>
+                            <a href="/jobs/<%= app.job.slug %>" style="font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 0.25rem;"><%= app.job.title %></a>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">🏢 <%= app.job.company_name %> | 🕒 <%= new Date(app.createdAt).toLocaleDateString('ar-EG') %></span>
+                        </div>
+                        
+                        <% if (app.EmploymentOutcome) { %>
+                            <!-- Already surveyed -->
+                            <span class="badge badge-success">مكتمل</span>
+                        <% } else { %>
+                            <!-- Needs survey or pending -->
+                            <% 
+                                const daysSince = Math.floor((new Date() - new Date(app.createdAt)) / (1000 * 60 * 60 * 24)); 
+                                if (daysSince >= 15) { 
+                            %>
+                                <a href="/user/survey/<%= app.id %>" class="btn btn-danger" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">مطلوب الرد!</a>
+                            <% } else { %>
+                                <div style="text-align: left;" dir="ltr">
+                                    <span style="display: block; font-size: 0.8rem; color: var(--primary); font-weight: 700; text-align: right; margin-bottom: 0.3rem;">تواصل مع صاحب العمل:</span>
+                                    <% if (app.job.contact_phone) { %>
+                                        <a href="tel:<%= app.job.contact_phone %>" style="font-weight: 700; font-size: 0.95rem; text-decoration: underline;"><%= app.job.contact_phone %> 📞</a>
+                                    <% } else if (app.job.contact_whatsapp) { %>
+                                        <a href="https://wa.me/2<%= app.job.contact_whatsapp %>" target="_blank" style="font-weight: 700; font-size: 0.95rem; color: #25D366; text-decoration: underline;"><%= app.job.contact_whatsapp %> 💬</a>
+                                    <% } else if (app.job.contact_info) { %>
+                                        <a href="tel:<%= app.job.contact_info %>" style="font-weight: 700; font-size: 0.95rem; text-decoration: underline;"><%= app.job.contact_info %> 📞</a>
+                                    <% } else { %>
+                                        <span class="badge badge-warning">تم التقديم</span>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="text-center py-8">
+                    <p>لم تقم بالتقديم على أي وظيفة حتى الآن.</p>
+                    <a href="/jobs" class="btn btn-primary mt-2">تصفح الوظائف المتاحة</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+

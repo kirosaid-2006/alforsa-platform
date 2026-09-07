@@ -1,0 +1,173 @@
+<!-- Admin Navbar -->
+<%- include('../../partials/admin-sidebar', { path: '/admin/users' }) %>
+
+<!-- Main Content -->
+<div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="margin: 0;">ملف المستخدم: <%= userProfile.full_name %> 👤</h2>
+        <a href="/admin/users" class="btn btn-outline">العودة للقائمة ↩️</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
+        
+        <!-- Sidebar Info -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Basic Details -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; border-bottom: 2px solid var(--bg-body); padding-bottom: 0.5rem;">البيانات الأساسية</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.95rem;">
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">الرقم القومي</span>
+                        <strong><%= userProfile.national_id %></strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">رقم الهاتف</span>
+                        <strong dir="ltr"><%= userProfile.phone %></strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">رقم الواتساب</span>
+                        <strong dir="ltr"><%= userProfile.whatsapp_phone %></strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">البريد الإلكتروني</span>
+                        <strong><%= userProfile.email || 'غير مسجل' %></strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">تاريخ الميلاد</span>
+                        <strong><%= new Date(userProfile.birth_date).toLocaleDateString('ar-EG') %></strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">العنوان</span>
+                        <strong><%= userProfile.city %> <%= userProfile.detailed_address ? ' - ' + userProfile.detailed_address : '' %></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Qualification & Skills -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; border-bottom: 2px solid var(--bg-body); padding-bottom: 0.5rem;">التعليم والخبرة</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.95rem;">
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">المؤهل الدراسي</span>
+                        <strong>
+                            <% 
+                                const qualMap = {
+                                    'none': 'بدون مؤهل', 'diploma': 'دبلوم', 
+                                    'institute': 'معهد', 'bachelors': 'بكالوريوس/ليسانس', 
+                                    'masters': 'ماجستير', 'phd': 'دكتوراه'
+                                };
+                            %>
+                            <%= qualMap[userProfile.qualification] %>
+                        </strong>
+                    </div>
+                    <% if (userProfile.college_institute) { %>
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">الكلية / المعهد</span>
+                        <strong><%= userProfile.college_institute %></strong>
+                    </div>
+                    <% } %>
+                    <div>
+                        <span style="color: var(--text-secondary); display: block; font-size: 0.85rem;">سنوات الخبرة</span>
+                        <strong><%= userProfile.experience_years ? userProfile.experience_years + ' سنوات' : 'بدون خبرة' %></strong>
+                    </div>
+                    
+                    <% if (userProfile.cv_url) { %>
+                    <div style="margin-top: 1rem;">
+                        <a href="<%= userProfile.cv_url %>" target="_blank" class="btn btn-primary" style="width: 100%; text-align: center;">تحميل السيرة الذاتية (CV) 📄</a>
+                    </div>
+                    <% } else { %>
+                    <div style="margin-top: 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem; background: var(--bg-body); border-radius: var(--radius-sm);">
+                        لم يقم برفع سيرة ذاتية
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Main Area -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <!-- Survey Outcomes -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    📊 نتائج استبيانات التوظيف
+                </h3>
+                
+                <% if (outcomes && outcomes.length > 0) { %>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <% outcomes.forEach(outcome => { %>
+                            <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <strong style="color: var(--primary);"><%= outcome.job ? outcome.job.title : 'وظيفة محذوفة' %></strong>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);"><%= new Date(outcome.createdAt).toLocaleDateString('ar-EG') %></span>
+                                </div>
+                                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+                                    <span>الحالة:</span>
+                                    <% if (outcome.outcome === 'hired') { %>
+                                        <span class="badge badge-success">✅ تم التعيين</span>
+                                    <% } else if (outcome.outcome === 'rejected') { %>
+                                        <span class="badge badge-danger">❌ تم الرفض</span>
+                                    <% } else if (outcome.outcome === 'fake_job') { %>
+                                        <span class="badge badge-warning">⚠️ وظيفة وهمية</span>
+                                    <% } else if (outcome.outcome === 'no_contact') { %>
+                                        <span class="badge" style="background: var(--bg-body); border: 1px solid var(--border);">لم يتم الرد</span>
+                                    <% } %>
+                                </div>
+                                <% if (outcome.notes) { %>
+                                    <div style="background: var(--bg-body); padding: 0.8rem; border-radius: var(--radius-sm); font-size: 0.9rem;">
+                                        <strong>تعليق المستخدم:</strong> <%= outcome.notes %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary); background: var(--bg-body); border-radius: var(--radius-sm);">
+                        لم يقم المستخدم بالإجابة على أي استبيانات بعد.
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Application History -->
+            <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm);">
+                <h3 style="margin: 1.5rem; margin-bottom: 1rem;">💼 سجل الوظائف المتقدم لها</h3>
+                
+                <table style="width: 100%; text-align: right; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--bg-body); border-bottom: 2px solid var(--border);">
+                            <th style="padding: 1rem 1.5rem;">الوظيفة</th>
+                            <th style="padding: 1rem 1.5rem;">تاريخ التقديم</th>
+                            <th style="padding: 1rem 1.5rem;">الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (applications && applications.length > 0) { %>
+                            <% applications.forEach(app => { %>
+                                <tr style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 1rem 1.5rem; font-weight: 600;">
+                                        <% if (app.job) { %>
+                                            <a href="/jobs/<%= app.job.slug %>" target="_blank" style="color: var(--primary); text-decoration: none;"><%= app.job.title %></a>
+                                        <% } else { %>
+                                            وظيفة محذوفة
+                                        <% } %>
+                                    </td>
+                                    <td style="padding: 1rem 1.5rem;"><%= new Date(app.createdAt).toLocaleDateString('ar-EG') %></td>
+                                    <td style="padding: 1rem 1.5rem;">
+                                        <span class="badge" style="background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main);">مسجل</span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr><td colspan="3" style="padding: 2rem; text-align: center; color: var(--text-secondary);">لم يقم بالتقديم على أي وظائف.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

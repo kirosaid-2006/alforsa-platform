@@ -1,0 +1,260 @@
+<div class="fursa-wrap">
+  <style>
+    /* FORCE HERO TO BE LIGHT SLATE, NOT BLUE */
+    .f-hero {
+      background-color: #f8fafc !important;
+      background-image: none !important;
+      color: #0f172a !important;
+    }
+    .f-hero-inner h1.f-title {
+      color: #0f172a !important;
+    }
+    .f-hero-inner .f-subtitle {
+      color: #64748b !important;
+    }
+    .f-eyebrow {
+      background: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+      color: #475569 !important;
+    }
+    /* FORCE SEARCH BUTTON TO BE AMBER (ORANGE/YELLOW) */
+    .f-search-btn {
+      background: #f59e0b !important;
+      background-color: #f59e0b !important;
+      color: #0b1220 !important;
+      border: none !important;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4) !important;
+    }
+    .f-search-btn:hover {
+      background: #fbbf24 !important;
+      background-color: #fbbf24 !important;
+    }
+    /* KILL ANY BLUE GRADIENTS ON THE SEARCH BAR */
+    .f-search {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+  </style>
+
+  <!-- HERO -->
+  <section class="f-hero scroll-reveal" style="background: var(--slate-50) !important; color: var(--slate-900) !important;">
+    <div class="dot-grid-overlay" style="background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);"></div>
+    <div class="glow-blob-1" style="background: radial-gradient(circle, var(--slate-200), transparent);"></div>
+    <div class="glow-blob-2" style="background: radial-gradient(circle, var(--amber-300), transparent);"></div>
+    <div class="f-hero-grid" aria-hidden="true"></div>
+
+    <div class="f-hero-inner saas-fade-up stagger-1">
+      <div class="f-eyebrow saas-fade-up stagger-2" style="color: var(--slate-600); background: var(--slate-100); border: 1px solid var(--slate-200);">
+        <div class="f-eyebrow-dot pulse-dot" style="margin-left: 8px;"></div>
+        أكثر من <%= locals.totalJobs ? locals.totalJobs : 0 %> وظيفة متاحة الآن
+      </div>
+
+      <h1 class="f-title saas-fade-up stagger-3" style="color: var(--slate-900) !important;">
+        ابحث عن<br>
+        <span class="f-title-accent" style="color: var(--amber-500) !important; text-shadow: none !important;">فرصتك القادمة</span>
+      </h1>
+
+      <p class="f-subtitle saas-fade-up stagger-4" style="color: var(--slate-600) !important;">
+        المنصة الموثوقة لتوصيل الكفاءات بالشركات في مصر — مباشرة وبدون وسيط.
+      </p>
+
+      <form class="f-search saas-fade-up stagger-5" action="/jobs" method="GET" style="background: white; border: 1px solid var(--slate-200); box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+        <div class="f-search-field">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="f-search-input" name="search" type="text" placeholder="ابحث: محاسب، سائق، فرد أمن…">
+        </div>
+        <div class="f-search-sep"></div>
+        <div class="f-search-select-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <select class="f-search-select" name="governorate">
+            <option value="">كل المحافظات</option>
+            <% if (locals.governorates && locals.governorates.length > 0) { %>
+                <% locals.governorates.forEach(gov => { %>
+                    <option value="<%= gov.id %>"><%= gov.name %></option>
+                <% }) %>
+            <% } %>
+          </select>
+        </div>
+        <button type="submit" class="f-search-btn">
+          ابحث الآن
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </form>
+
+      <div class="f-trust saas-fade-up stagger-6">
+        <span class="f-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          تسجيل مجاني
+        </span>
+        <span class="f-trust-sep">·</span>
+        <span class="f-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          تحديث يومي للوظائف
+        </span>
+        <span class="f-trust-sep">·</span>
+        <span class="f-trust-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          تواصل مباشر
+        </span>
+      </div>
+    </div>
+
+    <div class="f-ticker" aria-hidden="true">
+      <div class="f-ticker-track">
+        <% 
+        function getTickerEmoji(name) {
+            if (name.includes('محاسب') || name.includes('مالي')) return '📊';
+            if (name.includes('عمال') || name.includes('عامل')) return '👷';
+            if (name.includes('أمن') || name.includes('حراس')) return '🛡️';
+            if (name.includes('سائق')) return '🚗';
+            if (name.includes('فني') || name.includes('حرف')) return '🔧';
+            if (name.includes('مبيعات') || name.includes('مشتريات')) return '🛒';
+            if (name.includes('تقني') || name.includes('معلومات')) return '💻';
+            if (name.includes('هندس') || name.includes('مقاولات')) return '🏗️';
+            return '💼';
+        }
+        %>
+        <% if (locals.categories && locals.categories.length > 0) { %>
+            <% locals.categories.forEach(cat => { %>
+                <span class="f-ticker-item"><%= getTickerEmoji(cat.name) %> <%= cat.name %></span>
+            <% }) %>
+            <% locals.categories.forEach(cat => { %>
+                <span class="f-ticker-item"><%= getTickerEmoji(cat.name) %> <%= cat.name %></span>
+            <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEPS -->
+  <section class="f-section scroll-reveal">
+    <div class="f-section-head">
+      <div class="f-eyebrow-sm">كيف يعمل؟</div>
+      <h2 class="f-section-title">احصل على وظيفتك في 3 خطوات</h2>
+      <p class="f-section-sub">بسيط، سريع، وبدون تعقيدات</p>
+    </div>
+    <div class="f-steps-grid">
+      <div class="f-step" data-delay="0">
+        <div class="f-step-num">١</div>
+        <div class="f-step-icon f-step-icon--blue">👤</div>
+        <div class="f-step-title">أنشئ حسابك مجاناً</div>
+        <p class="f-step-body">سجّل بياناتك ومؤهلاتك مرة واحدة، وتقدّم على أي وظيفة بضغطة زر.</p>
+      </div>
+      <div class="f-step" data-delay="120">
+        <div class="f-step-num">٢</div>
+        <div class="f-step-icon f-step-icon--amber">🔍</div>
+        <div class="f-step-title">تصفح الوظائف</div>
+        <p class="f-step-body">ابحث بالمحافظة والتخصص بين آلاف الفرص المحدّثة يومياً.</p>
+      </div>
+      <div class="f-step" data-delay="240">
+        <div class="f-step-num">٣</div>
+        <div class="f-step-icon f-step-icon--green">📞</div>
+        <div class="f-step-title">تواصل مباشرة</div>
+        <p class="f-step-body">اضغط «تقديم» لرؤية أرقام الشركات والتواصل بلا وسيط.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="f-cats">
+    <div class="f-section-head">
+      <div class="f-eyebrow-sm">جميع التخصصات</div>
+      <h2 class="f-section-title">تصفح حسب المجال</h2>
+      <p class="f-section-sub">اختر تخصصك وابحث بين الوظائف المتاحة</p>
+    </div>
+    <div class="f-cat-grid">
+        <% 
+        function getCatEmoji(name) {
+            if (name.includes('محاسب') || name.includes('مالي')) return '📊';
+            if (name.includes('عمال') || name.includes('عامل')) return '👷';
+            if (name.includes('أمن') || name.includes('حراس')) return '🛡️';
+            if (name.includes('سائق')) return '🚗';
+            if (name.includes('فني') || name.includes('حرف')) return '🔧';
+            if (name.includes('مبيعات') || name.includes('مشتريات')) return '🛒';
+            if (name.includes('تقني') || name.includes('معلومات')) return '💻';
+            if (name.includes('هندس') || name.includes('مقاولات')) return '🏗️';
+            return '💼';
+        }
+        %>
+        <% if (locals.categories && locals.categories.length > 0) { %>
+            <% locals.categories.forEach((cat, idx) => { %>
+                <a href="/jobs?category=<%= cat.id %>" class="f-cat" data-delay="<%= idx * 60 %>">
+                    <span class="f-cat-icon"><%= getCatEmoji(cat.name) %></span>
+                    <strong class="f-cat-name"><%= cat.name %></strong>
+                    <span class="f-cat-count"><%= cat.jobs_count || 0 %> وظيفة</span>
+                </a>
+            <% }) %>
+        <% } %>
+    </div>
+  </section>
+
+  <!-- CTA + DISCLAIMER -->
+  <section class="f-cta">
+    <div class="f-cta-grid">
+      <div>
+        <div class="f-cta-eyebrow">لماذا فرصة؟</div>
+        <h2 class="f-cta-title">طريقك الأسرع<br>للوظيفة المناسبة</h2>
+        <p class="f-cta-body">منصة "فرصة" بوابتك المباشرة للشركات والمصانع في مصر. بحث سهل، مجاني، وبلا وسطاء.</p>
+        <ul class="f-features">
+          <li class="f-feature">
+            <span class="f-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            تحديثات يومية من شركات موثوقة
+          </li>
+          <li class="f-feature">
+            <span class="f-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            أرقام الشركات بضغطة واحدة
+          </li>
+          <li class="f-feature">
+            <span class="f-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            فرص لجميع المؤهلات والتخصصات
+          </li>
+        </ul>
+        <% if (!locals.user) { %>
+            <a href="/auth/register" class="f-cta-btn">
+            ابدأ رحلتك المهنية الآن
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+        <% } else { %>
+            <a href="/jobs" class="f-cta-btn">
+            تصفح الوظائف المتاحة
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+        <% } %>
+      </div>
+
+      <div class="f-disclaimer">
+        <div class="f-disc-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          إخلاء مسؤولية
+        </div>
+        <div class="f-disc-title">تنويه هام</div>
+        <p class="f-disc-body">الكنيسة لا تتدخل في أي شكل من أشكال التوظيف أو شروط العمل أو تحديد المرتبات.</p>
+        <p class="f-disc-body">دور "فرصة" يقتصر على كونه حلقة وصل مجانية لعرض الوظائف وتسهيل التواصل.</p>
+        <div class="f-disc-alert">
+          كافة تفاصيل العمل والتعاقد مسؤولية الشركة المعلنة والباحث بشكل حصري.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const steps = document.querySelectorAll('.f-step');
+const cats  = document.querySelectorAll('.f-cat');
+
+function animateOnScroll(entries, obs) {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const delay = parseInt(el.dataset.delay) || 0;
+      setTimeout(() => el.classList.add('visible'), delay);
+      obs.unobserve(el);
+    }
+  });
+}
+
+const io = new IntersectionObserver(animateOnScroll, { threshold: 0.15 });
+steps.forEach(el => io.observe(el));
+cats.forEach(el => io.observe(el));
+</script>
