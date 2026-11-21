@@ -1,4 +1,4 @@
-const { Job, Application, JobContactUnlock, ViewedJob, Category, Governorate } = require('../models');
+const { Job, Application, JobContactUnlock, ViewedJob, Category, Governorate, Report } = require('../models');
 const { Op } = require('sequelize');
 
 exports.index = async (req, res) => {
@@ -65,7 +65,6 @@ exports.show = async (req, res) => {
             return res.status(404).render('pages/404', { title: 'الوظيفة غير موجودة', path: '' });
         }
 
-        // View Counter logic
         const ipAddress = req.ip || req.connection.remoteAddress;
         const userId = req.user ? req.user.id : null;
         let hasViewed = false;
@@ -87,7 +86,6 @@ exports.show = async (req, res) => {
             await job.increment('views_count');
         }
 
-        // Check if user already applied
         let hasApplied = false;
         if (req.user) {
             const application = await Application.findOne({
@@ -139,7 +137,6 @@ exports.showCategory = async (req, res) => {
     }
 };
 
-// AJAX POST Route
 exports.apply = async (req, res) => {
     try {
         if (!req.user) {
@@ -153,7 +150,6 @@ exports.apply = async (req, res) => {
             return res.status(404).json({ error: 'الوظيفة غير موجودة' });
         }
 
-        // Check if already applied
         const [application, created] = await Application.findOrCreate({
             where: { job_id: job.id, user_id: req.user.id },
             defaults: {
@@ -212,9 +208,48 @@ exports.showQuickSubmit = async (req, res) => {
     }
 };
 
+exports.quickSubmit = async (req, res) => {
+    try {
+        const { company_name, contact_phone, contact_whatsapp, title, category_id, governorate_id, description } = req.body;
+
+        if (!company_name || !contact_phone || !title || !category_id || !governorate_id) {
+            req.flash('error', 'يرجى ملء جميع الحقول الإجبارية الفردية المطلوبة.');
+            return res.redirect('/jobs/quick-submit');
+        }
+
+        const rawSlug = title.trim().toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, '-');
+        const slug = `${rawSlug}-${Date.now()}`;
+
+        const jobDescription = description && description.trim() !== '' 
+            ? description.trim() 
+            : `تطلب شركة/مصنع (${company_name}) شغل وظيفة (${title}). للمزيد والتواصل المباشر مع مسؤول التوظيف عبر الهاتف والواتساب الموضحين.`;
+
+        await Job.create({
+            title: title.trim(),
+            slug,
+            company_name: company_name.trim(),
+            category_id: parseInt(category_id),
+            governorate_id: parseInt(governorate_id),
+            description: jobDescription,
+            contact_phone: contact_phone.trim(),
+            contact_whatsapp: contact_whatsapp ? contact_whatsapp.trim() : contact_phone.trim(),
+            contact_info: `الهاتف: ${contact_phone.trim()}` + (contact_whatsapp ? ` | واتساب: ${contact_whatsapp.trim()}` : ''),
+            image_url: req.file ? `/uploads/jobs/${req.file.filename}` : null,
+            status: 'pending',
+            source: 'web'
+        });
+
+        req.flash('success', 'تم إرسال الوظيفة بنجاح! سيتم مراجعتها من فريق الإدارة ونشرها على الموقع خلال ساعات قادمة.');
+        res.redirect('/jobs/quick-submit');
+    } catch (error) {
+        console.error('Quick Submit Job Error:', error);
+        req.flash('error', 'حدث خطأ أثناء إرسال الوظيفة. يرجى المحاولة مرة أخرى.');
+        res.redirect('/jobs/quick-submit');
+    }
+};
+
 exports.report = async (req, res) => {
     try {
-        const { Report } = require('../models');
         const { reason } = req.body;
         const jobId = req.params.id;
 
