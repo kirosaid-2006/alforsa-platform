@@ -15,14 +15,17 @@ if (process.env.DB_DIALECT === 'sqlite' || !process.env.DB_DIALECT) {
 
     sequelize = new Sequelize({
         dialect: 'sqlite',
+        dialectModule: require('sqlite3'),
         storage: storagePath,
-        logging: false, // تعيين true لعرض استعلامات SQL في الكونسول
+        logging: false,
     });
 } else {
     // الاتصال بـ PostgreSQL للإنتاج
+    const pg = require('pg');
     if (process.env.DATABASE_URL) {
         sequelize = new Sequelize(process.env.DATABASE_URL, {
             dialect: 'postgres',
+            dialectModule: pg,
             logging: false,
             dialectOptions: {
                 ssl: {
@@ -39,6 +42,7 @@ if (process.env.DB_DIALECT === 'sqlite' || !process.env.DB_DIALECT) {
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
             dialect: 'postgres',
+            dialectModule: pg,
             logging: false,
         });
     }
