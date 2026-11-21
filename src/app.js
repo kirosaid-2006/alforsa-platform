@@ -21,8 +21,10 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
 // Middlewares
-app.set('trust proxy', 1); // Trust the Render reverse proxy for secure cookies
-app.use(express.static(path.join(__dirname, '../public')));
+app.set('trust proxy', 1);
+app.use(express.static(path.join(__dirname, '../public'), {
+    maxAge: '1d' // كاش للملفات الثابتة لسرعة التصفح
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
@@ -32,8 +34,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'forsa-secret',
     resave: false,
     saveUninitialized: false,
-    // proxy: true, 
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // Removed secure flag temporarily for Render proxy
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 app.use(flash());
 
@@ -43,8 +44,8 @@ app.use((req, res, next) => {
     res.locals.error_messages = req.flash('error');
     res.locals.warning_messages = req.flash('warning');
     res.locals.user = req.session.user || null;
-    res.locals.pendingSurveys = 0; // Stub for now
-    res.locals.notificationCount = 0; // Stub for now
+    res.locals.pendingSurveys = 0;
+    res.locals.notificationCount = 0;
     next();
 });
 
@@ -55,30 +56,14 @@ app.use('/', routes);
 const startOutcomeSurveyJob = require('./jobs/outcomeSurvey.job');
 const startExpireJobsJob = require('./jobs/expireJobs.job');
 const telegramPullJob = require('./jobs/telegramPull.job');
-
 const runSeeders = require('./seeders');
 
-// Database Sync and Start Server
-sequelize.sync({ force: false })
-    .then(async () => {
-        console.log('✅ Database synchronized.');
-        
-        // Ensure image and URL columns are TEXT in PostgreSQL to support long URLs
-        try {
-            await sequelize.query('ALTER TABLE jobs ALTER COLUMN image_url TYPE TEXT;');
-            await sequelize.query('ALTER TABLE jobs ALTER COLUMN telegram_message_url TYPE TEXT;');
-            await sequelize.query('ALTER TABLE jobs ALTER COLUMN telegram_message_id TYPE TEXT;');
-            await sequelize.query('ALTER TABLE jobs ALTER COLUMN company_logo_url TYPE TEXT;');
-            await sequelize.query('ALTER TABLE jobs ALTER COLUMN company_website TYPE TEXT;');
-        } catch (alterErr) {
-            // Non-critical, ignored on SQLite or if already altered
-        }
-
-        // Auto-run seeders to populate roles, permissions, categories, governorates and settings
-        await runSeeders(false);
-        
-        // Start background jobs only in standalone server environment (not Vercel serverless)
-        if (!process.env.VERCEL) {
+// On Serverless (Vercel): لا نعيد عمل sync أو alter أو seeders مع كل ريكويست لتسريع الاستجابة
+if (!process.env.VERCEL) {
+    sequelize.sync({ force: false })
+        .then(async () => {
+            console.log('✅ Database synchronized.');
+            await runSeeders(false);
             startOutcomeSurveyJob();
             startExpireJobsJob();
             telegramPullJob.init();
@@ -86,10 +71,10 @@ sequelize.sync({ force: false })
             app.listen(PORT, () => {
                 console.log(`🚀 Forsa Server running at http://localhost:${PORT}`);
             });
-        }
-    })
-    .catch(err => {
-        console.error('❌ Failed to sync database:', err);
-    });
+        })
+        .catch(err => {
+            console.error('❌ Failed to sync database:', err);
+        });
+}
 
 module.exports = app;

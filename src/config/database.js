@@ -6,7 +6,6 @@ let sequelize;
 
 if (process.env.DB_DIALECT === 'sqlite' || !process.env.DB_DIALECT) {
     const storagePath = process.env.DB_STORAGE || './database/forsa.sqlite';
-    // التأكد من أن المجلد الرئيسي لملف SQLite موجود
     const fs = require('fs');
     const dir = path.dirname(path.resolve(storagePath));
     if (!fs.existsSync(dir)) {
@@ -20,13 +19,19 @@ if (process.env.DB_DIALECT === 'sqlite' || !process.env.DB_DIALECT) {
         logging: false,
     });
 } else {
-    // الاتصال بـ PostgreSQL للإنتاج
+    // الاتصال بـ PostgreSQL للإنتاج مع تفعيل الـ Connection Pool للسرعة القصوى
     const pg = require('pg');
     if (process.env.DATABASE_URL) {
         sequelize = new Sequelize(process.env.DATABASE_URL, {
             dialect: 'postgres',
             dialectModule: pg,
             logging: false,
+            pool: {
+                max: 5,
+                min: 0,
+                acquire: 30000,
+                idle: 10000
+            },
             dialectOptions: {
                 ssl: {
                     require: true,
@@ -44,6 +49,12 @@ if (process.env.DB_DIALECT === 'sqlite' || !process.env.DB_DIALECT) {
             dialect: 'postgres',
             dialectModule: pg,
             logging: false,
+            pool: {
+                max: 5,
+                min: 0,
+                acquire: 30000,
+                idle: 10000
+            }
         });
     }
 }
