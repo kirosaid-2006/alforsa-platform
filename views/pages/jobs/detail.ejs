@@ -21,12 +21,6 @@
 
             <hr style="border: none; border-top: 1px solid var(--border); margin: 2rem 0;">
 
-            <% if (job.image_url) { %>
-            <div style="margin-bottom: 2rem; text-align: center;">
-                <img src="<%= job.image_url %>" alt="صورة إعلان الوظيفة" style="max-width: 100%; max-height: 500px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-            </div>
-            <% } %>
-
             <div style="margin-bottom: 2rem;">
                 <h3 style="color: var(--primary); margin-bottom: 1rem;">وصف الوظيفة</h3>
                 <div style="white-space: pre-line; color: var(--text-secondary);">
@@ -58,23 +52,23 @@
                     <strong>المؤهل المطلوب:</strong><br>
                     <span>
                         <% if(job.qualification === 'none') { %> بدون مؤهل
-                        <% } else if(job.qualification === 'diploma') { %> دبلوم / مؤهل متوسط
-                        <% } else if(job.qualification === 'institute') { %> معهد / فوق متوسط
-                        <% } else if(job.qualification === 'bachelors') { %> بكالوريوس / ليسانس
+                        <% } else if(job.qualification === 'diploma') { %> دبلوم / متوسط
+                        <% } else if(job.qualification === 'institute') { %> فوق متوسط
+                        <% } else if(job.qualification === 'bachelors') { %> مؤهل عالي
                         <% } else { %> غير محدد <% } %>
                     </span>
                 </div>
                 <div>
                     <strong>الخبرة المطلوبة:</strong><br>
                     <span>
-                        <% if(job.min_experience_years === 0) { %> بدون خبرة
-                        <% } else if(job.min_experience_years) { %> <%= job.min_experience_years %> سنوات فأكثر
-                        <% } else { %> غير محدد <% } %>
+                        <% if(job.min_experience_years === 0) { %> لا يشترط خبرة
+                        <% } else if(job.min_experience_years) { %> <%= job.min_experience_years %> سنوات
+                        <% } else { %> حسب المقابلة <% } %>
                     </span>
                 </div>
                 <div>
                     <strong>ساعات العمل:</strong><br>
-                    <span><%= job.working_hours ? job.working_hours : 'غير محدد' %></span>
+                    <span><%= job.working_hours || 'دوام كامل' %></span>
                 </div>
             </div>
 
@@ -101,6 +95,13 @@
                             <% if (job.contact_info) { %>
                                 <div style="margin-top: 1rem; font-size: 1rem; color: var(--text-secondary);"><%= job.contact_info %></div>
                             <% } %>
+                            
+                            <% if (job.image_url) { %>
+                            <div style="margin-top: 1.5rem; text-align: center; border-top: 1px dashed var(--primary); padding-top: 1.5rem; width: 100%;">
+                                <h4 style="margin-bottom: 1rem; color: var(--primary);">صورة الإعلان والتفاصيل الأصلية</h4>
+                                <img src="<%= job.image_url %>" alt="صورة إعلان الوظيفة" style="max-width: 100%; max-height: 550px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                            </div>
+                            <% } %>
                         </div>
                     </div>
                 <% } else { %>
@@ -109,7 +110,7 @@
                     <button id="btn-apply-reveal" data-job-id="<%= job.id %>" class="btn btn-primary" style="font-size: 1.25rem; padding: 1rem 3rem;">
                         تقديم والحصول على بيانات التواصل
                     </button>
-                    <p style="margin-top: 1rem; font-size: 0.9rem;">بضغطك على هذا الزر، ستتمكن من رؤية أرقام هواتف الشركة للتواصل معهم مباشرة.</p>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">بضغطك على هذا الزر، ستتمكن من رؤية أرقام هواتف الشركة وصورة الإعلان الأصلية للتواصل المباشر.</p>
                     
                     <!-- Hidden Contact Section (revealed via JS AJAX) -->
                     <div id="contact-info-section" style="display: none; background: var(--primary-light); padding: 2rem; border-radius: var(--radius); border: 1px solid var(--primary); margin-top: 2rem;">
@@ -118,6 +119,11 @@
                             <div>📞 رقم الهاتف: <a href="#" id="c-phone" style="font-weight: 700; color: var(--primary); text-decoration: underline;">غير متوفر</a></div>
                             <div>💬 واتساب: <a id="c-whatsapp" href="#" target="_blank" style="font-weight: 700; color: #25D366; text-decoration: underline;">غير متوفر</a></div>
                             <div>📧 البريد الإلكتروني: <a href="#" id="c-email" style="font-weight: 700; color: var(--primary); text-decoration: underline;">غير متوفر</a></div>
+                            
+                            <div id="c-image-wrap" style="display: none; margin-top: 1.5rem; text-align: center; border-top: 1px dashed var(--primary); padding-top: 1.5rem; width: 100%;">
+                                <h4 style="margin-bottom: 1rem; color: var(--primary);">صورة الإعلان الأصلية</h4>
+                                <img id="c-image" src="" alt="صورة إعلان الوظيفة" style="max-width: 100%; max-height: 550px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                            </div>
                         </div>
                     </div>
                 <% } %>
@@ -158,15 +164,13 @@
     <div style="background: white; width: 100%; max-width: 500px; border-radius: var(--radius); padding: 2rem; position: relative;">
         <button onclick="document.getElementById('reportModal').style.display='none'" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
         <h3 style="margin-bottom: 1rem; color: var(--danger);">🚩 إبلاغ عن وظيفة</h3>
-        <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 1.5rem;">يرجى توضيح سبب البلاغ (مثال: الأرقام غير صحيحة، الوظيفة وهمية، طلب مبالغ مالية).</p>
-        
-        <textarea id="reportReason" class="form-control" rows="4" placeholder="اكتب سبب البلاغ هنا..."></textarea>
-        
-        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
-            <button id="submitReportBtn" class="btn btn-primary" style="flex: 1; background: var(--danger); border-color: var(--danger);">إرسال البلاغ</button>
-            <button onclick="document.getElementById('reportModal').style.display='none'" class="btn btn-outline" style="flex: 1;">إلغاء</button>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">يرجى توضيح سبب الإبلاغ لمراجعة الإعلان من قبل الإدارة:</p>
+        <textarea id="reportReason" class="form-control" rows="4" placeholder="مثال: رقم الهاتف خاطئ، الوظيفة وهمية، طلب مبالغ مالية..." style="width: 100%; margin-bottom: 1rem;"></textarea>
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button onclick="document.getElementById('reportModal').style.display='none'" class="btn btn-outline">إلغاء</button>
+            <button id="submitReportBtn" class="btn btn-primary" style="background: var(--danger); border-color: var(--danger);">إرسال البلاغ</button>
         </div>
-        <div id="reportStatusMessage" style="margin-top: 1rem; font-size: 0.9rem; text-align: center; display: none;"></div>
+        <div id="reportStatusMessage" style="display: none; margin-top: 1rem; font-weight: 700; text-align: center;"></div>
     </div>
 </div>
 

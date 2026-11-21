@@ -1,75 +1,51 @@
-const { Job, Category, Governorate, Application, JobContactUnlock, Report, ViewedJob } = require('../models');
-
-// ... (Rest of imports and file content will be handled in chunks)
-
+const { Job, Application, JobContactUnlock, ViewedJob, Category, Governorate } = require('../models');
 const { Op } = require('sequelize');
 
 exports.index = async (req, res) => {
     try {
-        const { q, gov, qual, exp, cat, page = 1 } = req.query;
-        const limit = 20;
-        const offset = (page - 1) * limit;
-
+        const { q, cat, gov, qual, exp } = req.query;
         const whereClause = { status: 'published' };
 
-        // Search Query
         if (q) {
             whereClause[Op.or] = [
-                { title: { [Op.like]: `%${q}%` } },
-                { company_name: { [Op.like]: `%${q}%` } }
+                { title: { [Op.iLike]: `%${q}%` } },
+                { description: { [Op.iLike]: `%${q}%` } },
+                { company_name: { [Op.iLike]: `%${q}%` } }
             ];
         }
 
-        // Category Filter
-        if (cat) {
-            whereClause.category_id = cat;
-        }
-
-        // Governorate Filter
-        if (gov) {
-            whereClause.governorate_id = gov;
-        }
-
-        // Qualification Filter
-        if (qual) {
-            whereClause.qualification = qual;
-        }
-
-        // Experience Filter
+        if (cat) whereClause.category_id = cat;
+        if (gov) whereClause.governorate_id = gov;
+        if (qual) whereClause.qualification = qual;
         if (exp) {
-            if (exp === 'none') {
-                whereClause.min_experience_years = 0;
-            } else {
-                whereClause.min_experience_years = { [Op.gte]: parseInt(exp) };
-            }
+            if (exp === 'none') whereClause.min_experience_years = 0;
+            else if (exp === '1') whereClause.min_experience_years = { [Op.gte]: 1 };
+            else if (exp === '3') whereClause.min_experience_years = { [Op.gte]: 3 };
+            else if (exp === '5') whereClause.min_experience_years = { [Op.gte]: 5 };
         }
 
-        const { count, rows } = await Job.findAndCountAll({
+        const jobs = await Job.findAll({
             where: whereClause,
             include: [
                 { model: Category, as: 'category' },
                 { model: Governorate, as: 'governorate' }
             ],
-            order: [['published_at', 'DESC'], ['createdAt', 'DESC']],
-            limit,
-            offset
+            order: [['published_at', 'DESC']]
         });
 
         const categories = await Category.findAll({ order: [['sort_order', 'ASC']] });
         const governorates = await Governorate.findAll({ order: [['sort_order', 'ASC']] });
 
         res.render('pages/jobs/index', {
-            title: 'تصفح الوظائف',
+            title: 'الوظائف المتاحة',
             path: '/jobs',
-            jobs: rows,
-            totalPages: Math.ceil(count / limit),
-            currentPage: parseInt(page),
+            jobs,
             categories,
             governorates,
             query: req.query
         });
     } catch (error) {
-        console.error('Jobs List Error:', error);
+        console.error('Job List Error:', error);
         res.status(500).send('Server Error');
     }
 };
@@ -77,9 +53,8 @@ exports.index = async (req, res) => {
 exports.show = async (req, res) => {
     try {
         const { slug } = req.params;
-
         const job = await Job.findOne({
-            where: { slug },
+            where: { slug, status: 'published' },
             include: [
                 { model: Category, as: 'category' },
                 { model: Governorate, as: 'governorate' }
@@ -87,16 +62,14 @@ exports.show = async (req, res) => {
         });
 
         if (!job) {
-            req.flash('error', 'الوظيفة المطلوبة غير موجودة أو تم إغلاقها.');
-            return res.redirect('/jobs');
+            return res.status(404).render('pages/404', { title: 'الوظيفة غير موجودة', path: '' });
         }
 
-        // Track unique views
+        // View Counter logic
+        const ipAddress = req.ip || req.connection.remoteAddress;
         const userId = req.user ? req.user.id : null;
-        const ipAddress = req.ip;
-
         let hasViewed = false;
-        
+
         if (userId) {
             const viewRecord = await ViewedJob.findOne({ where: { user_id: userId, job_id: job.id } });
             if (viewRecord) hasViewed = true;
@@ -138,7 +111,6 @@ exports.show = async (req, res) => {
 exports.showCategory = async (req, res) => {
     try {
         const { slug } = req.params;
-        
         const category = await Category.findOne({ where: { slug } });
         if (!category) return res.redirect('/jobs');
 
@@ -159,7 +131,7 @@ exports.showCategory = async (req, res) => {
             categoryName: category.name,
             jobs,
             governorates,
-            query: {} // no active filters initially
+            query: {}
         });
     } catch (error) {
         console.error(error);
@@ -192,10 +164,7 @@ exports.apply = async (req, res) => {
         });
 
         if (created) {
-            // New application
             await job.increment('applications_count');
-            
-            // Record contact unlock
             await JobContactUnlock.create({
                 user_id: req.user.id,
                 job_id: job.id,
@@ -205,56 +174,25 @@ exports.apply = async (req, res) => {
 
             return res.json({
                 success: true,
-                message: 'تم التقديم بنجاح! يمكنك الآن التواصل مع الشركة عبر الأرقام التالية:',
+                message: 'تم التقديم بنجاح! يمكنك الآن التواصل مع الشركة:',
                 phone: job.contact_phone,
                 whatsapp: job.contact_whatsapp,
-                email: job.contact_email
+                email: job.contact_email,
+                image_url: job.image_url
             });
         } else {
-            // Already applied
             return res.json({
                 success: true,
                 message: 'لقد قمت بالتقديم على هذه الوظيفة مسبقاً.',
                 phone: job.contact_phone,
                 whatsapp: job.contact_whatsapp,
-                email: job.contact_email
+                email: job.contact_email,
+                image_url: job.image_url
             });
         }
     } catch (error) {
         console.error('Job Apply Error:', error);
-        res.status(500).json({ error: 'حدث خطأ أثناء التقديم.' });
-    }
-};
-
-exports.report = async (req, res) => {
-    try {
-        if (!req.user) {
-            return res.status(401).json({ success: false, message: 'يجب تسجيل الدخول للإبلاغ عن وظيفة.' });
-        }
-
-        const jobId = req.params.id;
-        const { reason } = req.body;
-
-        if (!reason || reason.trim() === '') {
-            return res.status(400).json({ success: false, message: 'يجب كتابة سبب البلاغ.' });
-        }
-
-        const job = await Job.findByPk(jobId);
-        if (!job) {
-            return res.status(404).json({ success: false, message: 'الوظيفة غير موجودة.' });
-        }
-
-        await Report.create({
-            user_id: req.user.id,
-            job_id: job.id,
-            reason: reason.trim(),
-            status: 'pending'
-        });
-
-        return res.json({ success: true, message: 'تم إرسال البلاغ بنجاح للإدارة. شكراً لمساعدتك.' });
-    } catch (error) {
-        console.error('Report Job Error:', error);
-        res.status(500).json({ success: false, message: 'حدث خطأ أثناء إرسال البلاغ.' });
+        res.status(500).json({ error: 'حدث خطأ أثناء التقديم' });
     }
 };
 
@@ -262,56 +200,38 @@ exports.showQuickSubmit = async (req, res) => {
     try {
         const categories = await Category.findAll({ order: [['sort_order', 'ASC']] });
         const governorates = await Governorate.findAll({ order: [['sort_order', 'ASC']] });
-
         res.render('pages/jobs/quick-submit', {
-            title: 'أعلن عن وظيفة مجاناً (خاص بالشركات والمصانع)',
+            title: 'أعلن عن وظيفة',
             path: '/jobs/quick-submit',
             categories,
             governorates
         });
     } catch (error) {
-        console.error('Show Quick Submit Error:', error);
+        console.error(error);
         res.status(500).send('Server Error');
     }
 };
 
-exports.quickSubmit = async (req, res) => {
+exports.report = async (req, res) => {
     try {
-        const { company_name, contact_phone, contact_whatsapp, title, category_id, governorate_id, description } = req.body;
+        const { Report } = require('../models');
+        const { reason } = req.body;
+        const jobId = req.params.id;
 
-        if (!company_name || !contact_phone || !title || !category_id || !governorate_id) {
-            req.flash('error', 'يرجى ملء جميع الحقول الإجبارية الفردية المطلوبة.');
-            return res.redirect('/jobs/quick-submit');
+        if (!reason || !reason.trim()) {
+            return res.status(400).json({ error: 'يرجى كتابة سبب الإبلاغ' });
         }
 
-        const rawSlug = title.trim().toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, '-');
-        const slug = `${rawSlug}-${Date.now()}`;
-
-        const jobDescription = description && description.trim() !== '' 
-            ? description.trim() 
-            : `تطلب شركة/مصنع (${company_name}) شغل وظيفة (${title}). للمزيد والتواصل المباشر مع مسؤول التوظيف عبر الهاتف والواتساب الموضحين.`;
-
-        await Job.create({
-            title: title.trim(),
-            slug,
-            company_name: company_name.trim(),
-            category_id: parseInt(category_id),
-            governorate_id: parseInt(governorate_id),
-            description: jobDescription,
-            contact_phone: contact_phone.trim(),
-            contact_whatsapp: contact_whatsapp ? contact_whatsapp.trim() : contact_phone.trim(),
-            contact_info: `الهاتف: ${contact_phone.trim()}` + (contact_whatsapp ? ` | واتساب: ${contact_whatsapp.trim()}` : ''),
-            image_url: req.file ? `/uploads/jobs/${req.file.filename}` : null,
-            status: 'pending',
-            source: 'web'
+        await Report.create({
+            job_id: jobId,
+            user_id: req.user ? req.user.id : null,
+            reason: reason.trim(),
+            status: 'pending'
         });
 
-        req.flash('success', 'تم إرسال الوظيفة بنجاح! سيتم مراجعتها من فريق الإدارة ونشرها على الموقع خلال ساعات قادمة.');
-        res.redirect('/jobs/quick-submit');
+        res.json({ success: true, message: 'تم إرسال البلاغ بنجاح للإدارة لمراجعته.' });
     } catch (error) {
-        console.error('Quick Submit Job Error:', error);
-        req.flash('error', 'حدث خطأ أثناء إرسال الوظيفة. يرجى المحاولة مرة أخرى.');
-        res.redirect('/jobs/quick-submit');
+        console.error('Report Error:', error);
+        res.status(500).json({ error: 'حدث خطأ أثناء إرسال البلاغ.' });
     }
 };
-

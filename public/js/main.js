@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
             radio.addEventListener('change', (e) => {
                 if (e.target.value === 'hired') {
                     viaPlatformDiv.style.display = 'block';
-                    // Make it required
                     const viaPlatformInputs = viaPlatformDiv.querySelectorAll('input[type="radio"]');
                     viaPlatformInputs.forEach(input => input.required = true);
                 } else {
@@ -80,6 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         const emailEl = document.getElementById('c-email');
                         emailEl.textContent = data.email;
                         emailEl.href = `mailto:${data.email}`;
+                    }
+                    
+                    // Reveal Image inside apply if exists
+                    if (data.image_url) {
+                        const imgWrap = document.getElementById('c-image-wrap');
+                        const imgEl = document.getElementById('c-image');
+                        if (imgWrap && imgEl) {
+                            imgEl.src = data.image_url;
+                            imgWrap.style.display = 'block';
+                        }
                     }
                     
                     // Show success message
