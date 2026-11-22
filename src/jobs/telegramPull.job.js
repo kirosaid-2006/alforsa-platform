@@ -6,9 +6,6 @@ const deduplicationService = require('../services/deduplication.service');
 
 /**
  * Scrape a public Telegram channel using its web preview HTML
- * Automatically decomposes grouped photo albums into individual jobs
- * @param {string} username The channel username (e.g. @jobs_egypt or https://t.me/jobs_egypt)
- * @returns {Promise<Array<Object>>} Array of individual job items
  */
 function scrapeTelegramChannel(username) {
     return new Promise((resolve) => {
@@ -54,14 +51,12 @@ function scrapeTelegramChannel(username) {
                 for (let i = 1; i < messageChunks.length; i++) {
                     const messageHtml = messageChunks[i];
 
-                    // Main message ID (e.g. "opp_2026/189")
                     let mainId = null;
                     const idMatch = messageHtml.match(/data-post="([^"]+)"/);
                     if (idMatch && idMatch[1]) {
                         mainId = idMatch[1];
                     }
 
-                    // Extract text
                     let text = '';
                     const textMatch = messageHtml.match(/<div class="tgme_widget_message_text[^>]*>(.*?)<\/div>/s);
                     if (textMatch && textMatch[1]) {
@@ -77,7 +72,6 @@ function scrapeTelegramChannel(username) {
                         text = text.trim();
                     }
 
-                    // Find all photo wraps in this message
                     const photoRegex = /class="[^"]*tgme_widget_message_photo_wrap[^"]*"[^>]*style="[^"]*background-image:url\('([^']+)'\)[^"]*"(?:[^>]*href="([^"]+)")?/gi;
                     let photoMatch;
                     const photosInMessage = [];
@@ -136,19 +130,40 @@ function scrapeTelegramChannel(username) {
 }
 
 /**
- * Main job execution function
+ * Main job execution function (handles single channel username or all active channels)
  */
-async function pullJobsFromTelegram() {
+async function pullJobsFromTelegram(targetUsername = null) {
     console.log('🔄 [Telegram Cron] Starting pull job...');
 
     try {
-        const activeChannels = await TelegramChannel.findAll({
-            where: { is_active: true }
-        });
+        let channelsToPull = [];
 
-        if (activeChannels.length === 0) {
-            console.log('ℹ️ [Telegram Cron] No active channels found.');
-            return { success: true, message: 'No active channels found', count: 0 };
+        if (targetUsername) {
+            let cleanUser = targetUsername.trim().replace('@', '');
+            if (cleanUser.includes('t.me/')) cleanUser = cleanUser.split('t.me/').pop();
+            cleanUser = cleanUser.split('/')[0].split('?')[0];
+
+            const ch = await TelegramChannel.findOne({
+                where: { channel_username: { [require('sequelize').Op.iLike]: `%${cleanUser}%` } }
+            });
+            if (ch) {
+                channelsToPull.push(ch);
+            } else {
+                channelsToPull.push({
+                    channel_name: cleanUser,
+                    channel_username: cleanUser,
+                    save: async () => {}
+                });
+            }
+        } else {
+            channelsToPull = await TelegramChannel.findAll({
+                where: { is_active: true }
+            });
+        }
+
+        if (channelsToPull.length === 0) {
+            console.log('ℹ️ [Telegram Cron] No channels to pull.');
+            return [];
         }
 
         const allCategories = await Category.findAll();
@@ -162,7 +177,7 @@ async function pullJobsFromTelegram() {
         let totalAdded = 0;
         const results = [];
 
-        for (const channel of activeChannels) {
+        for (const channel of channelsToPull) {
             const channelResult = {
                 channel: channel.channel_name,
                 username: channel.channel_username,
@@ -178,7 +193,6 @@ async function pullJobsFromTelegram() {
             for (const item of items) {
                 const { text, imageUrl, telegram_message_id: msgId } = item;
 
-                // --- 1. Fast DB duplication check by Telegram Message ID ---
                 if (msgId) {
                     const alreadyImported = await Job.findOne({
                         where: { telegram_message_id: msgId }
@@ -192,7 +206,6 @@ async function pullJobsFromTelegram() {
 
                 const postNum = msgId && msgId.includes('/') ? msgId.split('/')[1] : (msgId || '');
 
-                // --- 2. Process with AI Vision or Smart Rule Engine ---
                 console.log(`🧠 [Processing] Parsing item ${msgId || ''} (@${channel.channel_username})... Image: ${imageUrl ? 'Yes' : 'No'}`);
                 try {
                     const extractedData = await grokService.extractJobData(text, imageUrl, {
@@ -202,15 +215,12 @@ async function pullJobsFromTelegram() {
                     
                     extractedData.source = 'telegram';
                     extractedData.telegram_message_id = msgId;
-                    // لا نظهر روابط تليجرام أو أي معلومات عن القناة للمستخدم العادي
                     extractedData.telegram_raw_text = text || (imageUrl ? `وظيفة معلنة بالصورة` : '');
                     
-                    // نحفظ الصورة في قاعدة البيانات لتظهر للمستخدم فقط بعد التقديم
                     if (imageUrl) {
                         extractedData.image_url = imageUrl;
                     }
 
-                    // --- 3. Content deduplication check ONLY if phone or long text exists ---
                     if (extractedData.contact_phone || (text && text.length > 80)) {
                         const duplicateResult = await deduplicationService.isDuplicate(extractedData);
                         if (duplicateResult.isDuplicate) {
@@ -220,14 +230,12 @@ async function pullJobsFromTelegram() {
                         }
                     }
 
-                    // --- 4. Match Category ---
                     let category_id = defaultCategoryId;
                     if (extractedData.suggested_category_slug) {
                         const matchedCat = allCategories.find(c => c.slug === extractedData.suggested_category_slug);
                         if (matchedCat) category_id = matchedCat.id;
                     }
 
-                    // --- 5. Match Governorate ---
                     let governorate_id = defaultGovernorateId;
                     if (extractedData.suggested_governorate_slug) {
                         const matchedGov = allGovernorates.find(g => g.slug === extractedData.suggested_governorate_slug);
@@ -237,15 +245,11 @@ async function pullJobsFromTelegram() {
                         if (matchedGovByName) governorate_id = matchedGovByName.id;
                     }
 
-                    // --- 6. Generate Clean Title & Unique Slug ---
-                    // استخراج عنوان الوظيفة الصريح فقط بدون اسم تليجرام أو أرقام البوستات
                     const rawTitle = (extractedData.title || 'وظيفة جديدة متاحة').trim();
                     const safeSlug = rawTitle.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, '-').substring(0, 45);
                     const jobSlug = `${safeSlug}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-
                     const jobDescription = (extractedData.description || 'تفاصيل وشروط الوظيفة موضحة بالصورة المرفقة. اضغط تقديم لرؤية التفاصيل والتواصل.').trim();
 
-                    // --- 7. Save Job as 'published' directly or 'pending' ---
                     const createdJob = await Job.create({
                         title: rawTitle,
                         slug: jobSlug,
@@ -262,12 +266,12 @@ async function pullJobsFromTelegram() {
                         contact_phone: extractedData.contact_phone || null,
                         contact_whatsapp: extractedData.contact_whatsapp || extractedData.contact_phone || null,
                         contact_info: extractedData.contact_phone ? `الهاتف: ${extractedData.contact_phone}` : null,
-                        image_url: extractedData.image_url || null, // تحفظ وتظهر فقط عند التقديم
+                        image_url: extractedData.image_url || null,
                         telegram_message_id: extractedData.telegram_message_id || null,
-                        telegram_message_url: null, // لا يظهر رابط القناة إطلاقاً
-                        telegram_raw_text: null, // لا تظهر نصوص القناة الأصلية
+                        telegram_message_url: null,
+                        telegram_raw_text: null,
                         source: 'telegram',
-                        status: 'published', // تنزل مباشرة للمستخدمين
+                        status: 'published',
                         published_at: new Date(),
                         posted_by: null
                     });
@@ -281,7 +285,6 @@ async function pullJobsFromTelegram() {
                 }
             }
             
-            // 8. Update channel statistics in DB
             channel.jobs_created = (channel.jobs_created || 0) + channelResult.added;
             channel.messages_count = (channel.messages_count || 0) + channelResult.fetched;
             channel.last_scraped_at = new Date();
@@ -293,11 +296,11 @@ async function pullJobsFromTelegram() {
         }
 
         console.log(`🎉 [Telegram Cron] Pull finished! Added ${totalAdded} clean published jobs.`);
-        return { success: true, count: totalAdded, results };
+        return results;
 
     } catch (error) {
         console.error('❌ [Telegram Cron] Global Failure:', error);
-        return { success: false, error: error.message };
+        return [{ error: error.message }];
     }
 }
 
@@ -314,5 +317,6 @@ function init() {
 module.exports = {
     init,
     pullJobsFromTelegram,
+    triggerManualPull: pullJobsFromTelegram,
     scrapeTelegramChannel
 };
