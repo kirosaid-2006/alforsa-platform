@@ -130,7 +130,7 @@ function scrapeTelegramChannel(username) {
 }
 
 /**
- * Main job execution function (handles single channel username or all active channels)
+ * Main job execution function
  */
 async function pullJobsFromTelegram(targetUsername = null) {
     console.log('🔄 [Telegram Cron] Starting pull job...');
@@ -168,7 +168,7 @@ async function pullJobsFromTelegram(targetUsername = null) {
 
         const allCategories = await Category.findAll();
         const allGovernorates = await Governorate.findAll();
-        const defaultCategory = allCategories.find(c => c.slug === 'other' || c.slug === 'manual-labor') || allCategories[0];
+        const defaultCategory = allCategories.find(c => c.slug === 'manual-labor') || allCategories[0];
         const defaultGov = allGovernorates.find(g => g.slug === 'cairo') || allGovernorates[0];
 
         const defaultCategoryId = defaultCategory ? defaultCategory.id : 1;
@@ -230,12 +230,14 @@ async function pullJobsFromTelegram(targetUsername = null) {
                         }
                     }
 
+                    // مطابقة التصنيف بدقة بالذكاء الاصطناعي
                     let category_id = defaultCategoryId;
                     if (extractedData.suggested_category_slug) {
                         const matchedCat = allCategories.find(c => c.slug === extractedData.suggested_category_slug);
                         if (matchedCat) category_id = matchedCat.id;
                     }
 
+                    // مطابقة المحافظة
                     let governorate_id = defaultGovernorateId;
                     if (extractedData.suggested_governorate_slug) {
                         const matchedGov = allGovernorates.find(g => g.slug === extractedData.suggested_governorate_slug);
@@ -245,11 +247,23 @@ async function pullJobsFromTelegram(targetUsername = null) {
                         if (matchedGovByName) governorate_id = matchedGovByName.id;
                     }
 
-                    const rawTitle = (extractedData.title || 'وظيفة جديدة متاحة').trim();
+                    // تنظيف العنوان تماماً من أي كلمات مصور أو تليجرام
+                    let rawTitle = (extractedData.title || '').trim();
+                    rawTitle = rawTitle.replace(/إعلان وظيفة مصور/g, '')
+                                       .replace(/وظيفة مصورة/g, '')
+                                       .replace(/#\d+/g, '')
+                                       .replace(/[💥🔥✨⚡️🚀📢🔴📣]/g, '')
+                                       .trim();
+
+                    if (!rawTitle || rawTitle.length < 3) {
+                        rawTitle = 'فرصة عمل جديدة';
+                    }
+
                     const safeSlug = rawTitle.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, '-').substring(0, 45);
                     const jobSlug = `${safeSlug}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
                     const jobDescription = (extractedData.description || 'تفاصيل وشروط الوظيفة موضحة بالصورة المرفقة. اضغط تقديم لرؤية التفاصيل والتواصل.').trim();
 
+                    // الوظائف تنزل بحالة pending للمراجعة في قائمة "الوظائف المعلقة" كما طلبت تماماً
                     const createdJob = await Job.create({
                         title: rawTitle,
                         slug: jobSlug,
@@ -271,12 +285,11 @@ async function pullJobsFromTelegram(targetUsername = null) {
                         telegram_message_url: null,
                         telegram_raw_text: null,
                         source: 'telegram',
-                        status: 'published',
-                        published_at: new Date(),
+                        status: 'pending', // تذهب للمراجعة والاعتماد أولاً
                         posted_by: null
                     });
                     
-                    console.log(`✅ [Telegram Cron] Published clean job: "${rawTitle}" (ID: ${createdJob.id})`);
+                    console.log(`✅ [Telegram Cron] Saved pending review job: "${rawTitle}" (ID: ${createdJob.id})`);
                     channelResult.added++;
                     
                 } catch (procError) {
@@ -295,7 +308,7 @@ async function pullJobsFromTelegram(targetUsername = null) {
             totalAdded += channelResult.added;
         }
 
-        console.log(`🎉 [Telegram Cron] Pull finished! Added ${totalAdded} clean published jobs.`);
+        console.log(`🎉 [Telegram Cron] Pull finished! Added ${totalAdded} jobs for review.`);
         return results;
 
     } catch (error) {
